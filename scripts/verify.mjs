@@ -204,12 +204,36 @@ console.log("\ntheme ↔ DESIGN.md");
   const { readFile } = await import("node:fs/promises");
   const designMd = await readFile(join(root, "DESIGN.md"), "utf8");
   const themeSrc = await readFile(join(root, "src", "theme.ts"), "utf8");
-  // DESIGN.md is the source of truth (D9); theme.ts must mirror its dark tokens so the
-  // palette can never silently desync from the spec (autonomy.md gate rule 5).
-  for (const hex of ["#2d353b", "#a7c080"]) {
-    check(designMd.includes(hex) && themeSrc.includes(hex), `theme.ts mirrors DESIGN.md dark token ${hex}`);
+  // DESIGN.md is the source of truth (D9); theme.ts must mirror it token-for-token so the
+  // palette can never silently desync from the spec (autonomy.md gate rule 5). Parse both
+  // into {key: hex} maps per mode (normalizing bg_lift/bgLift) and compare KEY-BY-KEY — a
+  // bare includes() can't catch a hex on the wrong key.
+  const hexMap = (text) => {
+    const map = {};
+    for (const mm of text.matchAll(/([a-zA-Z_]+)\s*:\s*"(#[0-9a-fA-F]{6})"/g)) {
+      map[mm[1].replace(/_/g, "").toLowerCase()] = mm[2].toLowerCase();
+    }
+    return map;
+  };
+  const sliceBetween = (text, start, end) => {
+    const i = text.indexOf(start);
+    if (i < 0) return "";
+    const j = text.indexOf(end, i + start.length);
+    return text.slice(i, j < 0 ? undefined : j);
+  };
+  for (const mode of ["dark", "light"]) {
+    const dMap = hexMap(sliceBetween(designMd, `\n  ${mode}:`, mode === "dark" ? "\n  light:" : "\ncolor_tier:"));
+    const tMap = hexMap(sliceBetween(themeSrc, `${mode}: {`, "},"));
+    const tKeys = Object.keys(tMap);
+    const bad = tKeys.find((k) => dMap[k] !== tMap[k]);
+    check(
+      tKeys.length >= 17 && !bad,
+      bad
+        ? `theme.ts ${mode}.${bad}=${tMap[bad]} ≠ DESIGN.md ${dMap[bad] ?? "(absent)"}`
+        : `theme.ts ${mode} mirrors all ${tKeys.length} DESIGN.md tokens`,
+    );
   }
-  check(!/#1a1b26|#7aa2f7/.test(themeSrc), "theme.ts has no leftover Tokyo Night tokens");
+  check(!/#1a1b26|#7aa2f7/i.test(themeSrc), "theme.ts has no leftover Tokyo Night tokens");
 }
 
 // ── 8. Gate strength (strengthen-only floor) ────────────────────────────────
