@@ -13,6 +13,13 @@ anything to eyeball. Newest first.
   built bin starts with `#!/usr/bin/env node`, the package is not private, and `bin.machud` resolves —
   TDD red (2 fails) → green. `pnpm verify` **PASS**. (Publishing itself is an outward action — not
   done; the package is just *ready* to `npx`.)
+  **Task-2 adversarial review caught a BLOCKER** (verdict blocking): `engines.node` was `>=20`, but
+  `@vue-tui/runtime@0.1.0` requires `>=22.18.0` (it pulls `string-width@8`, whose top-level `/v`
+  RegExp throws SyntaxError below Node 22.18) — so `npx machud` would crash at load on Node 20. Fixed:
+  `engines.node >=22.18.0` + a verify assertion that our floor ≥ the installed runtime's floor (drift
+  guard); added `prepack: vp build` (`npm pack` doesn't run `prepublishOnly`, and dist is gitignored,
+  so a clean tree packed a bin-less tarball); narrowed `files` to drop a stray `dist/icons.svg`.
+  Confirmed `npm pack --dry-run` → 3 clean files. `pnpm verify` PASS.
 
 - **QA review applied + D9/D13 vouched (docs only; branch `redesign`).** Ran a consolidation-QA
   adversarial review (4 auditors + a Codex pass) over the redesign docs; it returned `fix-then-lock`

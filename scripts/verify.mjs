@@ -149,6 +149,21 @@ console.log("\npackaging (npx, D13)");
     typeof pkg.bin?.machud === "string" && (await fileExists(join(root, pkg.bin.machud))),
     "bin.machud resolves to a built file",
   );
+  // engines.node must NOT understate the runtime's floor — a too-low floor lets npm
+  // install onto a Node that crashes at module load (@vue-tui/runtime pulls string-width@8,
+  // whose top-level /v RegExp throws SyntaxError below Node 22.18 / V8 12).
+  const floor = (r) => (r || "").match(/(\d+)\.(\d+)\.(\d+)/)?.slice(1).map(Number) ?? [0, 0, 0];
+  const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+  let rtEng = "";
+  try {
+    rtEng = JSON.parse(await readFile(join(root, "node_modules/@vue-tui/runtime/package.json"), "utf8")).engines?.node ?? "";
+  } catch {
+    /* runtime not resolvable → assertion fails loudly */
+  }
+  check(
+    rtEng !== "" && cmp(floor(pkg.engines?.node), floor(rtEng)) >= 0,
+    `engines.node (${pkg.engines?.node}) >= @vue-tui/runtime floor (${rtEng})`,
+  );
 }
 
 // ── Summary ─────────────────────────────────────────────────────────────────

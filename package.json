@@ -7,11 +7,11 @@
     "machud": "dist/machud.mjs"
   },
   "files": [
-    "dist",
+    "dist/machud.mjs",
     "DESIGN.md"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.18.0"
   },
   "keywords": [
     "macos",
@@ -28,7 +28,7 @@
     "start": "node dist/machud.mjs",
     "verify": "node scripts/verify.mjs",
     "test": "vp test",
-    "prepublishOnly": "vp build"
+    "prepack": "vp build"
   },
   "dependencies": {
     "@vue-tui/runtime": "^0.1.0",
