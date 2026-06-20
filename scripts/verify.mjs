@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 51;
+const MIN_CHECKS = 53;
 
 let failures = 0;
 let total = 0;
@@ -106,6 +106,10 @@ if (m) {
   check(inRangeOrNull(m.battery.healthPct, 0, 100), "battery health null or 0–100");
   check(inRangeOrNull(m.battery.adapterWatts, 0, 300), "battery adapterWatts null or 0–300");
   check(inRangeOrNull(m.battery.chargeWatts, -200, 200), "battery chargeWatts null or -200–200");
+  check(
+    !(typeof m.battery.chargeWatts === "number" && m.battery.chargeWatts < 0 && m.battery.charging),
+    "battery: never 'charging' while discharging (chargeWatts<0)",
+  );
   check(
     ["Nominal", "Fair", "Serious", "Critical"].includes(m.sensors.thermalPressure),
     "thermal pressure valid",
@@ -254,17 +258,21 @@ console.log("\ntest injection (RD0c)");
   }
   check(injected?.memory?.pressure === "High", "MACHUD_TEST_OVERRIDE deep-merges a synthetic value into the snapshot");
 }
-{
-  // Provenance (RD2): prove memory.ts reads the REAL kern.memorystatus_vm_pressure_level
-  // (1/2/4), not the usedPct heuristic — inject level 4 and require High (heuristic gives Normal here).
-  const env = { ...process.env, MACHUD_TEST_PRESSURE_LEVEL: "4" };
+// Provenance (RD2): prove memory.ts reads the REAL kern.memorystatus_vm_pressure_level (1/2/4),
+// not the usedPct heuristic. 4→High discriminates on an idle host; 1→Normal discriminates on a
+// LOADED host (heuristic would give Elevated/High there) — together they cover any host state.
+for (const [lvl, want] of [
+  ["4", "High"],
+  ["1", "Normal"],
+]) {
+  const env = { ...process.env, MACHUD_TEST_PRESSURE_LEVEL: lvl };
   let j = null;
   try {
     j = JSON.parse(await run("node", [bundle, "--json"], { env }));
   } catch {
     /* parse fail → assertion fails */
   }
-  check(j?.memory?.pressure === "High", "memory pressure from the real sysctl level (4 → High, not heuristic)");
+  check(j?.memory?.pressure === want, `memory pressure from the real sysctl level (${lvl} → ${want})`);
 }
 {
   // Provenance (RD2): ioreg Amperage is UNSIGNED 64-bit. Inject the discharge wraparound and
@@ -277,8 +285,9 @@ console.log("\ntest injection (RD0c)");
     /* parse fail → assertion fails */
   }
   check(
-    typeof j?.battery?.chargeWatts === "number" && j.battery.chargeWatts < 0,
-    "battery chargeWatts handles unsigned-Amperage wraparound (→ negative on discharge)",
+    j?.battery?.present === false ||
+      (typeof j?.battery?.chargeWatts === "number" && j.battery.chargeWatts < 0),
+    "battery chargeWatts handles unsigned-Amperage wraparound (→ negative on discharge, or no battery)",
   );
 }
 {

@@ -9,7 +9,8 @@ export async function collectBattery(): Promise<BatteryMetric> {
   const state =
     batt.match(/\d+%;\s*([^;]+);/)?.[1]?.trim() ||
     (batt.includes("AC Power") ? "AC power" : "unknown");
-  const charging = /charging/i.test(state) && !/not charging/i.test(state);
+  // \bcharging\b so "discharging" doesn't match (it contains "charging" with no word boundary).
+  const charging = /\bcharging\b/i.test(state) && !/discharging|not charging/i.test(state);
   const tm = batt.match(/(\d+):(\d+)\s+remaining/);
   const timeRemaining = tm && !(tm[1] === "0" && tm[2] === "00") ? `${tm[1]}:${tm[2]}` : null;
 

@@ -5,6 +5,16 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD2 review fixes (branch `redesign`).** The data-honesty review (verdict fix) found the data
+  layer solid but two visible product defects: (1) the charging detector matched "disCHARGING"
+  (`/charging/i` with no word boundary), so the panel showed "⚡ charging" while discharging —
+  contradicting RD2's new negative `chargeWatts`; fixed to `/\bcharging\b/` + exclude discharging,
+  and added a verify coherence assertion (never `charging` while `chargeWatts<0`). (2) The new watts
+  were collected but never rendered; BatteryPanel now shows `power −5.9W` / `+24W · 96W adapter`.
+  Also hardened two provenance tests: chargeWatts now `present`-guarded (won't false-RED on a
+  battery-less Mac), and memory pressure pairs `1→Normal` with `4→High` so it can't false-pass on a
+  loaded host. `pnpm verify` PASS (53). Confirmed live: panel shows "discharging" + "power −5.9W".
+
 - **RD2 — data-honesty collectors (branch `redesign`).** Made the headline metrics true, each TDD
   (red provenance assertion → implement → green) with a collector-level test hook: **memory** reads
   the real `kern.memorystatus_vm_pressure_level` (1/2/4→Normal/Elevated/High), heuristic only as a

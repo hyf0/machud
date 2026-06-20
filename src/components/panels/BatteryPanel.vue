@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
@@ -6,7 +7,18 @@ import { theme } from "../../theme";
 import { pct } from "../../lib/format";
 import type { BatteryMetric } from "../../types";
 
-defineProps<{ battery: BatteryMetric }>();
+const props = defineProps<{ battery: BatteryMetric }>();
+
+// Real-time charge power (+ in / − out) + the live-detected adapter max wattage (Mac-exclusive).
+const watts = computed(() => {
+  const b = props.battery;
+  const parts: string[] = [];
+  if (b.chargeWatts != null && Math.abs(b.chargeWatts) >= 0.1) {
+    parts.push(`${b.chargeWatts >= 0 ? "+" : "−"}${Math.abs(b.chargeWatts).toFixed(1)}W`);
+  }
+  if (b.adapterWatts != null) parts.push(`${b.adapterWatts}W adapter`);
+  return parts.join(" · ");
+});
 </script>
 
 <template>
@@ -29,6 +41,11 @@ defineProps<{ battery: BatteryMetric }>();
       <Text :color="theme.text">{{ pct(battery.healthPct) }}</Text>
       <Text :color="theme.dim">  cycles </Text>
       <Text :color="theme.text">{{ battery.cycleCount ?? "—" }}</Text>
+    </Box>
+
+    <Box v-if="watts">
+      <Text :color="theme.dim">power </Text>
+      <Text :color="theme.text">{{ watts }}</Text>
     </Box>
   </Panel>
 </template>
