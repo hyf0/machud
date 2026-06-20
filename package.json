@@ -1,0 +1,31 @@
+{
+  "name": "machud",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "machud": "dist/machud.mjs"
+  },
+  "scripts": {
+    "dev": "vue-tui dev",
+    "build": "vp build",
+    "start": "node dist/machud.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@vue-tui/cli": "^0.0.3",
+    "@vue-tui/runtime": "^0.1.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vitejs/plugin-vue": "^6",
+    "@vue-tui/testing": "^0.0.3",
+    "typescript": "~6.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@11.8.0"
+}
