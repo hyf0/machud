@@ -5,6 +5,14 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 7) — stability: battery power row always present (branch `redesign`).** Principle-8 fix
+  for the owner's "rows jump / grow taller": the BATTERY `power` row was `v-if="watts"`, so it vanished
+  with no charge flow (charged on AC, no adapter watts), shrinking the panel a row each time charging
+  finishes / you unplug. Now it ALWAYS renders — `±NW · NW adapter` when there's flow, else `on AC`
+  (battery present) / `—` (none). TDD: inject a no-flow battery → the power row must still render; red
+  (vanished) → green. `MIN_CHECKS` 66→67. `pnpm verify` PASS (67). **Next stability:** pad the
+  top-process/app lists to a fixed 3 rows; right-align numeric columns (health/cycles).
+
 - **RD4 (part 6) — 3-tier layout (branch `redesign`).** Reordered App.vue into the DESIGN hierarchy:
   tier-1 CPU+MEM (heroes), **tier-2 Network (lead) + GPU + Battery**, **tier-3 Disk + Sensors**.
   Previously tier-2 was GPU+Disk+Net and tier-3 was Battery+Sensors — now Network leads (owner-ranked

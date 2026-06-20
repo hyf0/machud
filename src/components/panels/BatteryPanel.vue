@@ -43,9 +43,9 @@ const watts = computed(() => {
       <Text :color="theme.text">{{ battery.cycleCount ?? "—" }}</Text>
     </Box>
 
-    <Box v-if="watts">
+    <Box>
       <Text :color="theme.dim">power </Text>
-      <Text :color="theme.text">{{ watts }}</Text>
+      <Text :color="theme.text">{{ watts || (battery.present ? "on AC" : "—") }}</Text>
     </Box>
   </Panel>
 </template>

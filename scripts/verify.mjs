@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 66;
+const MIN_CHECKS = 67;
 
 let failures = 0;
 let total = 0;
@@ -373,6 +373,18 @@ for (const [lvl, want] of [
   };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("█ █ █ █"), "MEMORY hero renders a BigNumber (injected 88 → block figures)");
+}
+{
+  // Stability (RD4, Principle 8): the BATTERY power row is ALWAYS present (—/on AC off-discharge), so
+  // plugging in or finishing a charge never changes the panel's height (DESIGN's cited "height jump").
+  // Inject a charged-on-AC battery with no charge flow → the power row must still render.
+  const env = {
+    ...process.env,
+    MACHUD_TEST_OVERRIDE: JSON.stringify({ battery: { present: true, charging: false, chargeWatts: null, adapterWatts: null } }),
+    COLUMNS: "120",
+  };
+  const sf = stripAnsi(await run("node", [bundle, "--once"], { env }));
+  check(/power +(on AC|—)/.test(sf), "battery power row is always present (stability — on AC/— with no flow)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME
