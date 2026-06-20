@@ -5,6 +5,14 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 6) — 3-tier layout (branch `redesign`).** Reordered App.vue into the DESIGN hierarchy:
+  tier-1 CPU+MEM (heroes), **tier-2 Network (lead) + GPU + Battery**, **tier-3 Disk + Sensors**.
+  Previously tier-2 was GPU+Disk+Net and tier-3 was Battery+Sensors — now Network leads (owner-ranked
+  above Battery), Battery is medium, Disk/Sensors compress to the bottom. Pure reorder (same panel-count
+  per row) → no overflow; verify's no-overflow@120 + all-panels-render guard it (visual change,
+  eyeballed). `pnpm verify` PASS (66). **Next:** compact tier-3 Disk/Sensors into a true one-line status
+  strip; GPU history graph; then stability (fixed rows / right-aligned numeric columns).
+
 - **RD4 (part 5) — MEM hero density: BigNumber + braille graph (branch `redesign`).** After pt4 the
   density flipped (CPU fuller than MEMORY → MEM had the empty bottom). Brought MEMORY to tier-1 parity:
   replaced the small `61%` with a **BigNumber** and the 1-row Sparkline with the tall **braille Graph**

@@ -72,13 +72,13 @@ try {
     </Box>
 
     <Box flexDirection="row" :gap="1">
-      <GpuPanel :gpu="m.gpu" :history="hist.gpu" />
-      <DiskPanel :disk="m.disk" />
       <NetworkPanel :net="m.net" :rx="hist.rx" :tx="hist.tx" />
+      <GpuPanel :gpu="m.gpu" :history="hist.gpu" />
+      <BatteryPanel :battery="m.battery" />
     </Box>
 
     <Box flexDirection="row" :gap="1">
-      <BatteryPanel :battery="m.battery" />
+      <DiskPanel :disk="m.disk" />
       <SensorsPanel :sensors="m.sensors" />
     </Box>
 
