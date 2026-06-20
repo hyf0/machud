@@ -92,17 +92,20 @@ _(pick RD0 — top of Redesign.)_
   unsigned-wraparound `18446744073709551179` → assert chargeWatts ≈ −5.5 W (not +5.5e12); assert
   `m.net` no longer carries an `ip` field. verify green.
 
-- **RD3 — Everforest visual components** · `TODO`
-  One at a time, each gated: `BigNumber` (5-row block), `Meter` (gradient + `levelColor` ramp),
-  braille area `Graph`, status `○/◐/●` glyphs (the color-blind fix), DiskPanel near-full
-  text+ramp, **replace ALL `⚡` with `⇡/⇣` (`BatteryPanel.vue:15` AND `HeaderBar.vue:30`)**, and the
-  **D11 chalk-level fallback** (256→solid accent). Acceptance: RD0b's "no `⚡` anywhere in the frame"
-  assertion passes; RD0b assertions stay green at all FORCE_COLOR levels; snapshot each in the worklog.
+- **RD3 — Everforest visual components** · `DONE` (layout-coupled parts → RD4)
+  Done: gradient `Meter` (same-hue ramp on truecolor) + **D11 colour-tier fallback** (256→solid
+  accent); status `○/◐/●` glyphs (color-blind, on memory + thermal); DiskPanel earned near-full
+  text+ramp (amber ≥85% / red ≥95%); replaced ALL `⚡` with `⇡` (BatteryPanel + HeaderBar). verify:
+  no-`⚡` in frame, `●` on High pressure, `FULL` on 96% disk, truecolor-vs-256 fidelity. `pnpm verify`
+  PASS (58). **Moved to RD4** (layout-coupled — they need the tall hero panels): `BigNumber` (5-row
+  block hero number) and the braille area `Graph` (the flowing history chart needs panel height).
 
-- **RD4 — 3-tier layout (wide only)** · `TODO`
-  tier-1 hero CPU + Memory; tier-2 Network (lead) + GPU + Battery; tier-3 status strip
-  (Disk/Sensors/uptime/load). Must pass RD0b alignment + no-overflow at COLUMNS=120. Acceptance:
-  hierarchy matches DESIGN.md; verify green; snapshot in worklog.
+- **RD4 — 3-tier layout + hero visuals (wide only)** · `TODO`
+  tier-1 hero CPU + Memory (with the `BigNumber` 5-row hero number + a tall **braille area Graph**
+  for history); tier-2 Network (lead) + GPU + Battery; tier-3 status strip (Disk/Sensors/uptime/
+  load). Also apply the DESIGN.md **hue confinement** here (per-module hue on title/border/hero
+  only; panel bodies neutral grey + green). Must pass RD0b alignment + no-overflow at COLUMNS=120.
+  Acceptance: hierarchy matches DESIGN.md; verify green; snapshot in worklog.
 
 - **RD5 — Responsive (2-tier), LAST** · `TODO (D4 reopened)`
   Thread the gate-controlled width (`COLUMNS` → `renderToString({columns})`, already in main.ts) as
