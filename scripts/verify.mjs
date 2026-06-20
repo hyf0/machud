@@ -132,6 +132,25 @@ check(pty.includes("1049h"), "enters alternate screen (1049h)");
 check(pty.includes("1049l"), "restores on quit (1049l)");
 check(pty.includes("macOS system monitor"), "dashboard renders inside alt screen");
 
+// ── 6. Packaging: `npx machud` must be runnable (D13) ───────────────────────
+console.log("\npackaging (npx, D13)");
+{
+  const { readFile } = await import("node:fs/promises");
+  const binFirstLine = (await readFile(bundle, "utf8")).split("\n", 1)[0];
+  check(binFirstLine === "#!/usr/bin/env node", "built bin starts with a node shebang");
+  let pkg = {};
+  try {
+    pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+  } catch {
+    /* leave pkg empty → assertions below fail */
+  }
+  check(pkg.private !== true, "package is publishable (not private)");
+  check(
+    typeof pkg.bin?.machud === "string" && (await fileExists(join(root, pkg.bin.machud))),
+    "bin.machud resolves to a built file",
+  );
+}
+
 // ── Summary ─────────────────────────────────────────────────────────────────
 console.log("");
 if (failures === 0) {

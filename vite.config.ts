@@ -21,6 +21,9 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => !id.startsWith(".") && !id.startsWith("/") && !id.startsWith("\0"),
+      // Shebang so the bundle runs as the `machud` bin (e.g. `npx machud`). Node
+      // strips this line from .mjs, so `node dist/machud.mjs` is unaffected. (D13)
+      output: { banner: "#!/usr/bin/env node" },
     },
   },
 });

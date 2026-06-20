@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **Task 2 — `npx machud` runnable (D13; branch `redesign`).** Made the package publishable and the
+  bin executable: removed `private: true`, added `files`/`engines`/`keywords`/`prepublishOnly`, moved
+  dev-only `@vue-tui/cli` to devDependencies (the bundle only imports `@vue-tui/runtime` + `vue`), and
+  added a rollup `output.banner` shebang so `dist/machud.mjs` runs as a bin (Node strips it from
+  `.mjs`, so `node dist/machud.mjs` is unaffected). New verify.mjs **packaging** section asserts the
+  built bin starts with `#!/usr/bin/env node`, the package is not private, and `bin.machud` resolves —
+  TDD red (2 fails) → green. `pnpm verify` **PASS**. (Publishing itself is an outward action — not
+  done; the package is just *ready* to `npx`.)
+
 - **QA review applied + D9/D13 vouched (docs only; branch `redesign`).** Ran a consolidation-QA
   adversarial review (4 auditors + a Codex pass) over the redesign docs; it returned `fix-then-lock`
   and caught a BLOCKING miss + 2 factual errors I'd carried in. Fixed all on branch `redesign`:

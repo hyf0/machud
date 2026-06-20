@@ -1,26 +1,43 @@
 {
   "name": "machud",
   "version": "0.0.0",
-  "private": true,
+  "description": "A beautiful, zero-config terminal system monitor for macOS — a TUI reimagining of Stats.",
   "type": "module",
   "bin": {
     "machud": "dist/machud.mjs"
   },
+  "files": [
+    "dist",
+    "DESIGN.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "macos",
+    "system-monitor",
+    "tui",
+    "terminal",
+    "dashboard",
+    "stats",
+    "btop"
+  ],
   "scripts": {
     "dev": "vue-tui dev",
     "build": "vp build",
     "start": "node dist/machud.mjs",
     "verify": "node scripts/verify.mjs",
-    "test": "vp test"
+    "test": "vp test",
+    "prepublishOnly": "vp build"
   },
   "dependencies": {
-    "@vue-tui/cli": "^0.0.3",
     "@vue-tui/runtime": "^0.1.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@vitejs/plugin-vue": "^6",
+    "@vue-tui/cli": "^0.0.3",
     "@vue-tui/testing": "^0.0.3",
     "typescript": "~6.0.2",
     "vite": "catalog:",
