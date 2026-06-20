@@ -28,6 +28,7 @@ colors:
     text:    "#9da9a0"
     dim:     "#5c6a64"   # labels, tracks
     accent:  "#a7c080"   # PRIMARY accent — Everforest's own green
+    silver:  "#c4c9cf"   # Apple aluminium — the "mac" half of the mac|hud wordmark
     module:
       cpu:     "#a7c080"  # green  (hero)
       mem:     "#d699b6"  # purple
@@ -48,6 +49,7 @@ colors:
     text:    "#5c6a72"
     dim:     "#939f91"
     accent:  "#8da101"
+    silver:  "#8d939a"   # Apple aluminium (mac|hud wordmark)
     module:
       cpu:     "#8da101"
       mem:     "#df69ba"

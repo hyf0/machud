@@ -12,6 +12,7 @@ type ThemePalette = {
   text: string;
   dim: string;
   accent: string; // primary brand green
+  silver: string; // Apple aluminium — the "mac" half of the mac|hud wordmark
   cpu: string;
   mem: string;
   gpu: string;
@@ -33,6 +34,7 @@ const palettes: Record<AppearanceMode, ThemePalette> = {
     text: "#9da9a0",
     dim: "#5c6a64",
     accent: "#a7c080",
+    silver: "#c4c9cf",
 
     cpu: "#a7c080",
     mem: "#d699b6",
@@ -54,6 +56,7 @@ const palettes: Record<AppearanceMode, ThemePalette> = {
     text: "#5c6a72",
     dim: "#939f91",
     accent: "#8da101",
+    silver: "#8d939a",
 
     cpu: "#8da101",
     mem: "#df69ba",

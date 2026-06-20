@@ -5,6 +5,12 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **Two-tone `mac|hud` wordmark (owner request; branch `redesign`).** The top-left logo now splits
+  the word: **`mac`** in Apple aluminium/silver (`#c4c9cf` dark / `#8d939a` light) and **`hud`** in
+  the brand green — highlighting the "HUD for the Mac" reading. Added a `silver` token to the palette
+  (theme.ts + DESIGN.md, owner-directed extension of D9); the key-by-key theme pin now covers 18
+  tokens per mode. `pnpm verify` PASS (57).
+
 - **RD3 review fix — D11 gradient gate now matches the renderer (branch `redesign`).** The RD3
   visual review (verdict fix) caught a real major: `supportsTruecolor()` keyed off `COLORTERM`, but
   vue-tui emits 24-bit via **chalk's level** — so on kitty/wezterm/ghostty/iTerm/SSH (TERM-truecolor,

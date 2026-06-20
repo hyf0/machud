@@ -17,7 +17,7 @@ const clock = computed(() => {
 <template>
   <Box :paddingX="1" justifyContent="space-between">
     <Box>
-      <Text :color="theme.cpu" bold>machud</Text>
+      <Text :color="theme.silver" bold>mac</Text><Text :color="theme.accent" bold>hud</Text>
       <Text :color="theme.dim"> · macOS system monitor</Text>
     </Box>
     <Box>
