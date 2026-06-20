@@ -100,12 +100,22 @@ _(pick RD0 — top of Redesign.)_
   PASS (58). **Moved to RD4** (layout-coupled — they need the tall hero panels): `BigNumber` (5-row
   block hero number) and the braille area `Graph` (the flowing history chart needs panel height).
 
-- **RD4 — 3-tier layout + hero visuals (wide only)** · `TODO`
-  tier-1 hero CPU + Memory (with the `BigNumber` 5-row hero number + a tall **braille area Graph**
-  for history); tier-2 Network (lead) + GPU + Battery; tier-3 status strip (Disk/Sensors/uptime/
-  load). Also apply the DESIGN.md **hue confinement** here (per-module hue on title/border/hero
-  only; panel bodies neutral grey + green). Must pass RD0b alignment + no-overflow at COLUMNS=120.
-  Acceptance: hierarchy matches DESIGN.md; verify green; snapshot in worklog.
+- **RD4 — 3-tier layout + hero visuals + DENSITY/STABILITY (wide only)** · `TODO`
+  3-tier: tier-1 hero CPU + Memory; tier-2 Network (lead) + GPU + Battery; tier-3 status strip
+  (Disk/Sensors/uptime/load). Build the `BigNumber` (5-row hero number) + the tall **braille area
+  Graph** components here. **Owner feedback 2026-06-20 — make it interesting, not boring:**
+  - **Density (Principle 8):** every hero/large panel earns its space with real dynamic data — CPU =
+    BigNumber + tall history graph + **per-core grid (12 cores, P/E grouped, coloured by load)** +
+    cluster avgs + top process; MEM = breakdown bar (wired/compressed/app/cache) + history + top
+    procs; GPU = + history graph; DISK = + R/W I/O history. No big box with three numbers.
+  - **Stability (Principle 8):** fixed row structure — optional values (BATTERY `power`, time
+    remaining, dropped processes) render `—`/`on AC` in place, NEVER appear/disappear; numeric
+    columns right-align to a fixed width. A data change must not reflow a panel's height or shift a
+    column. (Fixes the "row suddenly grows taller" jump.)
+  - **Alignment/spacing:** consistent bar→value gaps, fixed label columns, even vertical rhythm.
+  - **Hue confinement:** per-module hue on title/border/hero number only; panel bodies neutral grey
+    + green (greenforward).
+  Must pass RD0b alignment + no-overflow at COLUMNS=120; verify green; snapshot in worklog.
 
 - **RD5 — Responsive (2-tier), LAST** · `TODO (D4 reopened)`
   Thread the gate-controlled width (`COLUMNS` → `renderToString({columns})`, already in main.ts) as

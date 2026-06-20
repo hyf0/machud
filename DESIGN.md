@@ -146,6 +146,12 @@ The seven principles are the whole spec in miniature.
    glance; history is a braille area graph. Maximize data-ink; delete chartjunk. *(Tufte.)*
 6. **Consistency.** Every panel's hero number lives in the same spot, same weight ramp; panels
    and bars align. Same things look the same. *(Gestalt: similarity, alignment.)*
+8. **Stable & dense (owner feedback 2026-06-20).** A panel's **row structure is FIXED** — an
+   optional value fills its slot with `—`/`on AC`, it never appears/disappears (a value popping in
+   or out must NOT change a panel's height or shift the row below it). Numeric columns **right-align
+   to a fixed width** so a value's length never moves the column. And a large/hero panel must **earn
+   its space with real, dynamic, comparative data** (history graphs, per-core grids, breakdowns) — a
+   big box holding three numbers is a failure, not minimalism.
 7. **Mac-native, honest data.** Show the zero-sudo Apple-Silicon signals others can't (P/E
    cores, adapter PD wattage, memory pressure, thermal pressure). What needs `sudo` is `—`,
    never faked, never prompted. *(Tufte "show the data"; decisions D2/D3.)*
@@ -226,11 +232,21 @@ hierarchy** — important up top, minor compressed below:
 
 ## Per-module specification (TARGET)
 
-- **CPU — tier-1 hero.** Big glanceable % + **real-time per-core load as a P/E-grouped grid**
-  (6 P + 6 E on Apple Silicon, from `os.cpus()`). **Apple-Silicon only:** detect cluster count via
-  `hw.nperflevels` (Intel = 1) — `cpu.ts` today reads `hw.perflevel0/1.logicalcpu` and treats a
-  missing `perflevel1` as `eCount=0`; branch on either, but on a single cluster render ONE unlabeled
-  cluster — never `0P+0E` or all-P. Frequency needs `sudo` → omitted.
+- **CPU — tier-1 hero (the showpiece — must be DENSE, not boring).** Fill the hero space with: the
+  **`BigNumber` overall %**; a **tall braille area history graph** (flowing, the btop look); the
+  **per-core grid** — each of the 12 cores its own mini-bar, **P and E clusters grouped + labelled,
+  coloured by load** (the small-multiples + the per-core data); **per-cluster averages**; and a
+  supporting line (top CPU process / load avg). **Apple-Silicon only** for the P/E split: detect
+  cluster count via `hw.nperflevels` (Intel = 1) — `cpu.ts` reads `hw.perflevel0/1.logicalcpu` and
+  treats a missing `perflevel1` as `eCount=0`; on a single cluster render ONE unlabelled cluster,
+  never `0P+0E` or all-P. Frequency needs `sudo` → `—`. (Two short bars + a number in a big box is
+  the failure mode Principle 8 forbids.)
+
+  **Same lens for the others (owner: 举一反三):** MEM → a wired/compressed/app/cache **breakdown bar**
+  + history graph + a fixed-height top-process list; GPU → util + a **history graph** (half-empty
+  today); DISK → R/W **I/O history** sparkline; BATTERY → the `power` row **always present** (`—`/`on
+  AC` off-discharge — this fixes the height jump) + optional charge history; SENSORS → compress (sudo
+  took its content) or add a thermal trend. Every panel: fixed rows, fixed-width numeric columns.
 - **MEM — tier-1 hero.** Used % + swap, **plus the real macOS memory-pressure level** from
   `sysctl kern.memorystatus_vm_pressure_level` (1→Normal / 2→Elevated / 4→High) — the Mac-native
   truth Activity Monitor leads with. (The current usedPct heuristic is only a fallback when the
