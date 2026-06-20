@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 46;
+const MIN_CHECKS = 49;
 
 let failures = 0;
 let total = 0;
@@ -103,6 +103,8 @@ if (m) {
   // Battery / Sensors
   check(inRange(m.battery.pct, 0, 100), "battery pct in 0–100");
   check(inRangeOrNull(m.battery.healthPct, 0, 100), "battery health null or 0–100");
+  check(inRangeOrNull(m.battery.adapterWatts, 0, 300), "battery adapterWatts null or 0–300");
+  check(inRangeOrNull(m.battery.chargeWatts, -200, 200), "battery chargeWatts null or -200–200");
   check(
     ["Nominal", "Fair", "Serious", "Critical"].includes(m.sensors.thermalPressure),
     "thermal pressure valid",
@@ -262,6 +264,21 @@ console.log("\ntest injection (RD0c)");
     /* parse fail → assertion fails */
   }
   check(j?.memory?.pressure === "High", "memory pressure from the real sysctl level (4 → High, not heuristic)");
+}
+{
+  // Provenance (RD2): ioreg Amperage is UNSIGNED 64-bit. Inject the discharge wraparound and
+  // require chargeWatts < 0 — without the signed reinterpret it would be a huge POSITIVE number.
+  const env = { ...process.env, MACHUD_TEST_AMPERAGE: "18446744073709551179" };
+  let j = null;
+  try {
+    j = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(
+    typeof j?.battery?.chargeWatts === "number" && j.battery.chargeWatts < 0,
+    "battery chargeWatts handles unsigned-Amperage wraparound (→ negative on discharge)",
+  );
 }
 
 // ── 9. Gate strength (strengthen-only floor) ────────────────────────────────

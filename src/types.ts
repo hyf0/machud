@@ -72,6 +72,8 @@ export interface BatteryMetric {
   cycleCount: number | null;
   healthPct: number | null;
   tempC: number | null;
+  adapterWatts: number | null; // live-detected AC adapter max wattage (null on battery)
+  chargeWatts: number | null; // real-time V·I into/out of the battery (+ charging, − discharging)
 }
 
 export interface SensorsMetric {

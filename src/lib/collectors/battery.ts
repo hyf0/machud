@@ -27,5 +27,39 @@ export async function collectBattery(): Promise<BatteryMetric> {
   const tRaw = ioNum("Temperature");
   const tempC = tRaw != null ? tRaw / 100 : null;
 
-  return { present, pct, state, charging, timeRemaining, cycleCount, healthPct, tempC };
+  // Real-time charge power = Voltage(mV) · Amperage(mA) / 1e6 = W. ioreg reports Amperage as an
+  // UNSIGNED 64-bit int, so reinterpret as signed (+ into the battery / charging, − out /
+  // discharging) BEFORE computing. MACHUD_TEST_AMPERAGE is a test-only input hook (verify.mjs).
+  const toSigned64 = (s: string | null | undefined): number | null => {
+    if (s == null) return null;
+    try {
+      let v = BigInt(s);
+      if (v >= 1n << 63n) v -= 1n << 64n;
+      return Number(v);
+    } catch {
+      return null;
+    }
+  };
+  const voltage = ioNum("Voltage"); // mV
+  const rawAmp = process.env.MACHUD_TEST_AMPERAGE ?? io.match(/"Amperage" = (-?\d+)/)?.[1];
+  const amperage = toSigned64(rawAmp); // signed mA
+  const chargeWatts = voltage != null && amperage != null ? (voltage * amperage) / 1e6 : null;
+
+  // Adapter max wattage — live-detected (AdapterDetails.Watts), varies by cable/charger; only on AC.
+  const externalConnected = /"ExternalConnected" = Yes/.test(io);
+  const wattsMatch = io.match(/"Watts"=(\d+)/);
+  const adapterWatts = externalConnected && wattsMatch ? Number(wattsMatch[1]) : null;
+
+  return {
+    present,
+    pct,
+    state,
+    charging,
+    timeRemaining,
+    cycleCount,
+    healthPct,
+    tempC,
+    adapterWatts,
+    chargeWatts,
+  };
 }

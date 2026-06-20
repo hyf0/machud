@@ -40,6 +40,8 @@ export function emptyMetrics(): Metrics {
       cycleCount: null,
       healthPct: null,
       tempC: null,
+      adapterWatts: null,
+      chargeWatts: null,
     },
     sensors: { thermalPressure: "Nominal", speedLimit: 100, batteryTempC: null, fanRpm: null },
     appearance: { mode: "light" },
