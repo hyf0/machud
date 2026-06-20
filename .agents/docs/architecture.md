@@ -21,12 +21,15 @@ src/
   lib/
     exec.ts               sh() — exec that resolves "" on any failure
     format.ts             humanBytes / pct / temp / clamp
-    sparkline.ts          block sparkline + bar cell helpers
+    sparkline.ts          block sparkline + braille area chart + bar cell helpers
+    color.ts              hex mix / same-hue ramp + D11 truecolor gate (gradients)
+    bignum.ts             3×5 block-figure font for the BigNumber hero
     empty.ts              emptyMetrics() — initial + per-collector fallback
     collectors/           one file per module, each async + self-degrading
       cpu / memory / gpu / disk / network / battery / sensors / appearance / index(collectAll)
   components/
     Panel.vue Bar.vue Sparkline.vue        shared widgets
+    Graph.vue BigNumber.vue                braille area history + 5-row hero number (RD4)
     panels/*Panel.vue HeaderBar.vue        one per module
 ```
 

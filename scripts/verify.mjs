@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 61;
+const MIN_CHECKS = 62;
 
 let failures = 0;
 let total = 0;
@@ -323,6 +323,14 @@ for (const [lvl, want] of [
   const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ disk: { usedPct: 96 } }), COLUMNS: "120" };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("FULL"), "disk shows the earned near-full signal (96% → FULL)");
+}
+{
+  // BigNumber hero (RD4): the CPU panel's overall % renders as 5-row block figures (DESIGN.md
+  // glyphs.big_digit; Principle 1 "one hero metric, BIG"). Inject 88 → the two big 8s carry the
+  // alternating mid-rows "█ █ █ █" that no bar/braille/sparkline produces — a value-specific signature.
+  const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { usage: 88 } }), COLUMNS: "120" };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("█ █ █ █"), "CPU hero renders a BigNumber (injected 88 → 5-row block figures)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME

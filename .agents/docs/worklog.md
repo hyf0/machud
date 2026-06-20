@@ -5,6 +5,19 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 2) — `BigNumber` hero number (branch `redesign`).** Added `src/lib/bignum.ts` (3×5
+  block-figure font, 0–9 + `-`/space; `bigDigits()` joins glyphs with a 1-col gap → 5 rows) and
+  `BigNumber.vue` (renders the rounded value as 5-row figures with a gentle same-hue top-bright ramp,
+  solid below truecolor via the SAME D11 gate as the meters/graph, so the whole panel decides
+  truecolor↔256 identically). Wired into the CPU hero, replacing the small `42%` text — the panel now
+  leads with a big block number over the braille history graph (Principle 1 "one hero metric, BIG").
+  TDD: verify injects `cpu.usage=88` → the two big 8s emit `█ █ █ █` (a signature no bar/braille/
+  sparkline produces); red (absent) → green. `MIN_CHECKS` 61→62. `pnpm verify` PASS (62). Also removed
+  the RD3-era throwaway `cool-proto.mjs` (its palette-picking job is done).
+  **To eyeball:** `FORCE_COLOR=3 node dist/machud.mjs` — the CPU hero-number gradient. **Note:** tier-1
+  is now lopsided (tall CPU vs short MEM) until MEM earns its hero/density — expected mid-RD4; next
+  parts: per-core grid, MEM/GPU/DISK density, then the 3-tier layout + stability.
+
 - **RD0d — real `npx` artifact gate: pack → install → exec (branch `redesign`).** verify §6 only
   inspected the local checkout, so a packaging bug that bites only the *installed* package could sail
   through green. Added verify §9: `pnpm pack` (publishes the pnpm way — resolves `catalog:`, runs

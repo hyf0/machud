@@ -4,6 +4,7 @@ import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
 import Graph from "../Graph.vue";
+import BigNumber from "../BigNumber.vue";
 import { theme } from "../../theme";
 import { pct } from "../../lib/format";
 import type { CpuMetric } from "../../types";
@@ -31,7 +32,7 @@ const pStr = computed(() =>
     </template>
 
     <Box justifyContent="space-between">
-      <Text :color="theme.cpu" bold>{{ pct(cpu.usage) }}</Text>
+      <BigNumber :value="cpu.usage" suffix="%" :color="theme.cpu" />
       <Text :color="theme.dim">load {{ cpu.loadAvg[0].toFixed(2) }}</Text>
     </Box>
 
