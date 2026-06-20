@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 1) — braille area history graph (branch `redesign`).** New `brailleArea()`
+  (2×4-subpixel area chart) + `Graph.vue` (measures its own width, vertical gradient top→bottom,
+  truecolor-aware via D11). Swapped the CPU panel's 1-row Sparkline for a **tall 4-row braille graph**
+  — the flowing btop-style history (the start of making the CPU hero dense, not boring, per the owner
+  feedback). The `--once`/verify path has no rolling history, so App now synthesizes a **flat band at
+  the current reading** (honest — no invented trend; the live app uses the real history). verify
+  asserts a braille area graph renders. `pnpm verify` PASS (58). Next RD4: per-core grid, BigNumber,
+  MEM/GPU graphs, then the 3-tier layout + stability + hue confinement.
+
 - **Two-tone `mac|hud` wordmark (owner request; branch `redesign`).** The top-left logo now splits
   the word: **`mac`** in Apple aluminium/silver (`#c4c9cf` dark / `#8d939a` light) and **`hud`** in
   the brand green — highlighting the "HUD for the Mac" reading. Added a `silver` token to the palette

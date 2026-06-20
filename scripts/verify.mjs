@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 57;
+const MIN_CHECKS = 58;
 
 let failures = 0;
 let total = 0;
@@ -137,6 +137,7 @@ const stripAnsi = (s) => s.replace(/\x1b\[[0-9;]*m/g, "");
 const widest = Math.max(0, ...frame.split("\n").map((l) => [...stripAnsi(l)].length));
 check(widest <= 120, `no overflow at wide target (widest line ${widest} ≤ 120)`);
 check(!frame.includes("⚡"), "no ⚡ emoji in the frame (charge state uses ⇡/⇣)");
+check(/[⠁-⣿]/.test(frame), "braille area history graph renders (filled braille)");
 
 // ── 4. Appearance modes ────────────────────────────────────────────────────
 console.log("\nappearance");

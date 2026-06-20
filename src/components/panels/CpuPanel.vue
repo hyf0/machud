@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
-import Sparkline from "../Sparkline.vue";
+import Graph from "../Graph.vue";
 import { theme } from "../../theme";
 import { pct } from "../../lib/format";
 import type { CpuMetric } from "../../types";
@@ -35,7 +35,7 @@ const pStr = computed(() =>
       <Text :color="theme.dim">load {{ cpu.loadAvg[0].toFixed(2) }}</Text>
     </Box>
 
-    <Sparkline :values="history" :max="100" :color="theme.cpu" />
+    <Graph :values="history" :max="100" :height="4" :color="theme.cpu" />
 
     <Box>
       <Text :color="theme.dim">P </Text>

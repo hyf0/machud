@@ -25,6 +25,22 @@ const m = computed<Metrics>(() => props.snapshot ?? metrics.value ?? emptyMetric
 const clockTs = computed(() => (props.snapshot ? props.snapshot.ts || Date.now() : now.value));
 const width = computed(() => columns.value || 120);
 
+// The one-shot `--once` render has no rolling history, so the graphs would be blank. Show a flat
+// band at the current reading — honest (no invented trend) and enough to render a representative
+// frame. The live app uses the real rolling history.
+const hist = computed(() => {
+  if (!props.snapshot) return history.value;
+  const s = props.snapshot;
+  const flat = (v: number) => Array.from({ length: 48 }, () => v);
+  return {
+    cpu: flat(s.cpu.usage),
+    gpu: flat(s.gpu.usage ?? 0),
+    mem: flat(s.memory.usedPct),
+    rx: flat(s.net.rxBps),
+    tx: flat(s.net.txBps),
+  };
+});
+
 watchEffect(() => setThemeMode(m.value.appearance.mode));
 
 // Exit cleanly via the app lifecycle so the alternate screen is restored on quit.
@@ -51,14 +67,14 @@ try {
     <HeaderBar :m="m" :now="clockTs" />
 
     <Box flexDirection="row" :gap="1">
-      <CpuPanel :cpu="m.cpu" :history="history.cpu" />
-      <MemoryPanel :memory="m.memory" :history="history.mem" />
+      <CpuPanel :cpu="m.cpu" :history="hist.cpu" />
+      <MemoryPanel :memory="m.memory" :history="hist.mem" />
     </Box>
 
     <Box flexDirection="row" :gap="1">
-      <GpuPanel :gpu="m.gpu" :history="history.gpu" />
+      <GpuPanel :gpu="m.gpu" :history="hist.gpu" />
       <DiskPanel :disk="m.disk" />
-      <NetworkPanel :net="m.net" :rx="history.rx" :tx="history.tx" />
+      <NetworkPanel :net="m.net" :rx="hist.rx" :tx="hist.tx" />
     </Box>
 
     <Box flexDirection="row" :gap="1">
