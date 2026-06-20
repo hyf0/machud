@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 58;
+const MIN_CHECKS = 61;
 
 let failures = 0;
 let total = 0;
@@ -42,6 +42,17 @@ async function run(cmd, args, opts = {}) {
     return stdout;
   } catch (e) {
     return (e.stdout ?? "") + (e.stderr ?? "");
+  }
+}
+
+// Like run(), but surfaces the process exit code (run() swallows it) — for asserting
+// a spawned binary exits 0. Returns { code, out } with stdout+stderr combined.
+async function runExit(cmd, args, opts = {}) {
+  try {
+    const { stdout, stderr } = await pexec(cmd, args, { maxBuffer: 16 << 20, ...opts });
+    return { code: 0, out: (stdout ?? "") + (stderr ?? "") };
+  } catch (e) {
+    return { code: typeof e.code === "number" ? e.code : 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
   }
 }
 
@@ -339,7 +350,71 @@ for (const [lvl, want] of [
   );
 }
 
-// ── 9. Gate strength (strengthen-only floor) ────────────────────────────────
+// ── 9. Real npx artifact: pack → install → exec (RD0d, D13) ─────────────────
+// The packaging section (6) inspects the LOCAL checkout; it cannot catch a bug that
+// only surfaces from the *installed* package: a prepack that doesn't build, a bin that
+// won't launch, or — the big one — a runtime import missing from `dependencies` (deps
+// are EXTERNAL in this bundle, so an undeclared import crashes `npx machud` at load).
+// This packs the way a pnpm project publishes (`pnpm pack` resolves `catalog:` + runs
+// prepack), installs the tarball into a throwaway project the way `npx` does (npm),
+// then runs the INSTALLED bin for real. Heaviest section (a clean pack rebuilds + a
+// real install resolves the dep tree) → kept last, just before the count pin.
+console.log("\nnpx artifact (pack → install → exec, D13)");
+{
+  const { mkdtemp, mkdir, writeFile, readdir, rm: rmrf } = await import("node:fs/promises");
+  const os = await import("node:os");
+  const tmp = await mkdtemp(join(os.tmpdir(), "machud-npx-"));
+  try {
+    // Clean-tree pack: drop the bundle so the tarball can only carry a dist/machud.mjs
+    // that THIS pack rebuilt via prepack (catches a prepack that silently fails to build).
+    await rm(bundle, { force: true });
+    await run("pnpm", ["pack", "--pack-destination", tmp]);
+    const tgzName = (await readdir(tmp)).find((f) => f.endsWith(".tgz"));
+    const tgz = tgzName ? join(tmp, tgzName) : null;
+    const tarList = tgz ? await run("tar", ["-tzf", tgz]) : "";
+    check(
+      tarList.split("\n").some((l) => l.trim().endsWith("dist/machud.mjs")),
+      "npx tarball carries dist/machud.mjs (prepack builds the bin on a clean pack)",
+    );
+
+    // Install into a throwaway consumer the way `npx` does (npm), resolving the EXTERNAL
+    // runtime deps (vue / @vue-tui/runtime / chalk) from the registry/cache.
+    const proj = join(tmp, "consumer");
+    await mkdir(proj, { recursive: true });
+    await writeFile(
+      join(proj, "package.json"),
+      JSON.stringify({ name: "machud-npx-test", version: "1.0.0", private: true }),
+    );
+    const binLink = join(proj, "node_modules", ".bin", "machud");
+    let linked = false;
+    if (tgz) {
+      await run("npm", ["install", tgz, "--prefer-offline", "--no-audit", "--no-fund", "--loglevel=error"], {
+        cwd: proj,
+      });
+      linked = await fileExists(binLink);
+    }
+    check(linked, "npm install <tgz> resolves the dep tree and links the machud bin");
+
+    // Run the INSTALLED bin via .bin/machud — exercises the shebang (byte 0) + the +x bit
+    // npm sets, AND proves every external import resolves at runtime (no missing dep).
+    let exec = { code: 1, out: "" };
+    if (linked) exec = await runExit(binLink, ["--once"], { cwd: proj, env: { ...process.env, COLUMNS: "120" } });
+    check(
+      exec.code === 0 && /CPU/.test(exec.out),
+      `installed \`machud --once\` launches the published bin (exit ${exec.code}, CPU ${
+        /CPU/.test(exec.out) ? "rendered" : "MISSING"
+      })`,
+    );
+    if (exec.code !== 0) {
+      const first = exec.out.split("\n").find((l) => l.trim()) ?? "(no output)";
+      console.log(`    \x1b[31m↳ ${first.slice(0, 200)}\x1b[0m`);
+    }
+  } finally {
+    await rmrf(tmp, { recursive: true, force: true });
+  }
+}
+
+// ── 10. Gate strength (strengthen-only floor) ───────────────────────────────
 console.log("\ngate strength");
 check(total >= MIN_CHECKS, `ran ${total} assertions ≥ pinned floor ${MIN_CHECKS} (strengthen-only)`);
 

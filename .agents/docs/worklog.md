@@ -5,6 +5,23 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD0d — real `npx` artifact gate: pack → install → exec (branch `redesign`).** verify §6 only
+  inspected the local checkout, so a packaging bug that bites only the *installed* package could sail
+  through green. Added verify §9: `pnpm pack` (publishes the pnpm way — resolves `catalog:`, runs
+  `prepack`) on a **clean tree** (rm the bundle first) → `npm install <tgz>` into a throwaway project
+  (the `npx`/consumer side) → exec the **installed** `.bin/machud --once`. Asserts the tarball carries
+  `dist/machud.mjs`, the bin links, and it exits 0 + renders `CPU`. `MIN_CHECKS` 58→61.
+  **TDD red:** a no-op `prepack` (→ binless tarball) turned all 3 RD0d checks RED while §6 stayed
+  GREEN — proving real-artifact coverage §6 can't give (the Task-2 "clean tree packed a bin-less
+  tarball" bug). Restored → **`pnpm verify` PASS (61)**.
+  **Findings worth keeping:** chalk is a *transitive* dep of `@vue-tui/runtime` and npm hoists it in
+  the consumer, so dropping a *direct* dep does NOT break the installed bin; and pnpm's strict
+  symlinked node_modules drops a direct dep's top-level link on a deps-sync, breaking *local*
+  resolution — so the binless-tarball break (not a missing-dep break) is the honest red here.
+  **To eyeball / note:** the gate is now heavier (a second full build via prepack + a real `npm
+  install`) and needs network on a cold npm cache — expected per the backlog's "heavier/slower",
+  kept as the last functional section. Only `scripts/verify.mjs` changed (package.json restored).
+
 - **RD4 (part 1) — braille area history graph (branch `redesign`).** New `brailleArea()`
   (2×4-subpixel area chart) + `Graph.vue` (measures its own width, vertical gradient top→bottom,
   truecolor-aware via D11). Swapped the CPU panel's 1-row Sparkline for a **tall 4-row braille graph**

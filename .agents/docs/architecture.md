@@ -74,6 +74,13 @@ stay `—` forever. Never asking for a password is part of the product.
 `node dist/machud.mjs --once` — primes delta collectors, waits 700ms, reads real
 data, renders one frame, exits. No TTY needed.
 
+The `pnpm verify` gate also exercises the **real `npx` artifact** (RD0d, D13): it `pnpm pack`s the
+package the way a pnpm project publishes (resolving `catalog:`, running `prepack`), `npm install`s the
+tarball into a throwaway project the way `npx` does, and execs the installed bin — so a packaging
+regression (binless tarball, unlaunchable bin, unresolved dep) fails the gate here, not on a user's
+first `npx machud`. It's the heaviest section (a second full build + a real install; needs network on
+a cold npm cache), so it runs last.
+
 ## Scope status
 
 Shipped: CPU (P/E), Memory, GPU, Disk, Network, Battery, Sensors, Clock (header),

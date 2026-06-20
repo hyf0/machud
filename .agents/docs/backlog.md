@@ -56,7 +56,17 @@ _(pick RD0 — top of Redesign.)_
   battery-sign / pressure-1·2·4 / Intel-single-cluster / 96%-disk-`FULL` fixtures live in **RD2/RD3**,
   where those fields exist — not here.)
 
-- **RD0d — Real `npx` gate: pack → install → exec** · `TODO`
+- **RD0d — Real `npx` gate: pack → install → exec** · `DONE`
+  Done: verify §9 packs the way a pnpm project publishes (`pnpm pack` — resolves `catalog:` + runs
+  `prepack`) on a **clean tree** (`rm`s the bundle first), installs the tarball into a throwaway
+  project the way `npx` does (`npm install <tgz>`), and execs the **installed** `.bin/machud --once`,
+  asserting (1) the tarball carries `dist/machud.mjs`, (2) the bin links, (3) exit 0 + `CPU` renders.
+  `MIN_CHECKS` 58→61. **TDD red:** a no-op `prepack` → binless tarball turned all 3 RD0d checks RED
+  while the static §6 stayed GREEN (proves the real-artifact coverage §6 can't give); restored →
+  `pnpm verify` PASS (61). Finding: chalk is a *transitive* dep of `@vue-tui/runtime` (npm hoists it
+  in the consumer) and pnpm's strict symlinks break *local* resolution if you drop a direct dep — so
+  the binless-tarball break, not a missing-dep break, is the honest red. Heaviest section (2 builds +
+  a real install; needs network on a cold npm cache) → kept last.
   (From the Task-2 review.) verify's packaging section inspects the local checkout, not the published
   artifact, so an install-time crash (e.g. the engines floor) could sail through green. Add: `npm pack`
   to a temp dir, `npm install <tgz>` into a throwaway project, run `node_modules/.bin/machud --once`,
