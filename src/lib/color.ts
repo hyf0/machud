@@ -1,8 +1,13 @@
 // Small colour helpers for the gradient meters/graphs, plus the D11 colour-tier gate.
+import chalk from "chalk";
 
 export function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
-  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  const ch = (a: number, b: number) => {
+    const v = parseInt(h.slice(a, b), 16);
+    return Number.isFinite(v) ? v : 0;
+  };
+  return [ch(0, 2), ch(2, 4), ch(4, 6)];
 }
 
 function toHex([r, g, b]: [number, number, number]): string {
@@ -28,9 +33,10 @@ export function ramp(hex: string, n: number): string[] {
 }
 
 // D11: gradients are a TRUECOLOR enhancement, not a guarantee. macOS's default Terminal.app is
-// 256-colour — there we degrade to a single solid accent instead of a (banded) gradient. We key
-// off COLORTERM, the same signal vue-tui itself uses to decide whether to emit 24-bit (38;2)
-// codes — FORCE_COLOR only toggles colour on/off, it does NOT mean truecolor.
+// 256-colour — there we degrade to a solid accent instead of a (banded) gradient. We gate on the
+// SAME signal vue-tui uses to decide whether to emit 24-bit (38;2) codes: chalk's detected level
+// (>= 3 means truecolor). Keying off the identical source means the gradient decision and the
+// renderer's colour emission can never diverge (no lost gradient on kitty/ssh; no 256-colour banding).
 export function supportsTruecolor(): boolean {
-  return /truecolor|24bit/i.test(process.env.COLORTERM ?? "");
+  return chalk.level >= 3;
 }

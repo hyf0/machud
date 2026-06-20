@@ -313,23 +313,28 @@ for (const [lvl, want] of [
   check(f.includes("FULL"), "disk shows the earned near-full signal (96% → FULL)");
 }
 {
-  // Colour-tier / D11 (RD3): on a truecolor terminal (COLORTERM=truecolor) the meters render as
-  // 24-bit (38;2) same-hue gradients; on a 256-colour terminal (e.g. Terminal.app, COLORTERM
-  // unset) vue-tui downsamples — no 38;2 codes — and the gradient degrades to solid. Both render.
+  // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME
+  // signal vue-tui uses to emit 24-bit, so they can't diverge. At chalk.level 3 the meters render
+  // a per-cell 38;2 gradient; at level 2 (256-colour, e.g. Terminal.app) it degrades to solid with
+  // NO 38;2 codes (no banding). We drive the level deterministically via FORCE_COLOR.
   const hi = await run("node", [bundle, "--once"], {
     env: { ...process.env, COLORTERM: "truecolor", FORCE_COLOR: "3", COLUMNS: "120" },
   });
   const lo = await run("node", [bundle, "--once"], {
-    env: { ...process.env, COLORTERM: "", FORCE_COLOR: "3", COLUMNS: "120" },
+    env: { ...process.env, COLORTERM: "", FORCE_COLOR: "2", COLUMNS: "120" },
   });
-  const distinctHi = new Set(hi.match(/38;2;\d+;\d+;\d+/g) ?? []).size;
+  // Per-bar gradient: ONE bar line must carry several distinct 38;2 cells — a solid-colour
+  // regression (broken ramp / fill-length gate) would collapse this to ~1, even though frame-wide
+  // chrome colours alone exceed any whole-frame threshold.
+  const barLine = hi.split("\n").find((l) => l.includes("used ")) ?? "";
+  const barColors = new Set(barLine.match(/38;2;\d+;\d+;\d+/g) ?? []).size;
   check(
-    distinctHi > 8 && hi.includes("CPU") && !/NaN|undefined/.test(hi),
-    `truecolor renders 24-bit gradient meters (${distinctHi} distinct colours)`,
+    barColors >= 3 && hi.includes("CPU") && !/NaN|undefined/.test(hi),
+    `truecolor renders a per-cell gradient meter (${barColors} colours in one bar)`,
   );
   check(
     !lo.includes("\x1b[38;2;") && lo.includes("CPU") && !/NaN|undefined/.test(lo),
-    "256-colour terminal degrades cleanly — no 24-bit codes",
+    "256-colour (chalk.level 2) degrades to solid — no 24-bit codes",
   );
 }
 

@@ -5,6 +5,17 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD3 review fix — D11 gradient gate now matches the renderer (branch `redesign`).** The RD3
+  visual review (verdict fix) caught a real major: `supportsTruecolor()` keyed off `COLORTERM`, but
+  vue-tui emits 24-bit via **chalk's level** — so on kitty/wezterm/ghostty/iTerm/SSH (TERM-truecolor,
+  no COLORTERM) the gradient was silently lost, and on `COLORTERM=24bit` + 256-colour TERM it banded.
+  Fixed: added `chalk` as a direct dep and `supportsTruecolor() = chalk.level >= 3` — byte-for-byte
+  the same signal as the renderer, so they can't diverge. Verified end-to-end: `chalk.level 3` →
+  per-cell gradient (13 colours in one bar), `chalk.level 2` → solid, no 38;2 (no banding).
+  Strengthened the verify gradient assertion to **per-bar** (whole-frame chrome alone passed the old
+  `>8` threshold). Also hardened `barCells`/`hexToRgb` against NaN/malformed input (latent, one line
+  each). `pnpm verify` PASS (57).
+
 - **Dropped accessibility — owner ruling, VOUCHED (branch `redesign`).** Owner ruled a11y out of
   scope (D14): for a passive full-screen TUI the only realistic a11y is colour-independence, and even
   that isn't wanted. Reverted the `○◐●` status glyphs (RD3 pt1) — status is colour-only again

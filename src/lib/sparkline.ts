@@ -20,7 +20,7 @@ export function sparkline(values: number[], width: number, max?: number): string
 
 // A solid horizontal gauge: filled cells + empty cells, total `width`.
 export function barCells(value: number, max: number, width: number): { fill: string; rest: string } {
-  const ratio = max > 0 ? clamp(value / max, 0, 1) : 0;
+  const ratio = max > 0 && Number.isFinite(value) ? clamp(value / max, 0, 1) : 0;
   const filled = Math.round(ratio * width);
   return { fill: "█".repeat(filled), rest: "░".repeat(Math.max(0, width - filled)) };
 }
