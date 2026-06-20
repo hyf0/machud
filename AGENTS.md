@@ -2,9 +2,13 @@
 
 A beautiful, zero-config terminal system monitor for macOS — a TUI reimagining of
 [Stats](https://github.com/exelban/stats) (mac-stats.com), built with
-[vue-tui](https://github.com/vuejs-ai/vue-tui). Unlike btop's deep configurability,
-machud is opinionated and out-of-the-box: a curated wide-screen dashboard with
-Apple-Silicon-aware panels.
+[vue-tui](https://github.com/vuejs-ai/vue-tui).
+
+**machud is opinionated — that's the whole point.** Where btop wins on deep configurability,
+machud wins on *beautiful + zero-config*: there are no settings, no theme switcher, no layout
+knobs. The single curated wide-screen dashboard — Apple-Silicon-aware, system-following
+light/dark — **is** the product. Want to tune everything yourself? Use btop. machud is the
+considered default that looks right out of the box and never asks for your password.
 
 > **Contributing:** machud is opinionated by design. Bug reports are welcome; **feature PRs
 > opened without a prior, agreed-upon issue are closed directly**, and theming/feature/aesthetic

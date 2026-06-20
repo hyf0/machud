@@ -1,7 +1,7 @@
 {
   "name": "machud",
   "version": "0.0.0",
-  "description": "A beautiful, zero-config terminal system monitor for macOS — a TUI reimagining of Stats.",
+  "description": "An opinionated, beautiful, zero-config macOS terminal system monitor — one curated dashboard you don't configure (a TUI reimagining of Stats).",
   "type": "module",
   "bin": {
     "machud": "dist/machud.mjs"
