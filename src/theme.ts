@@ -1,12 +1,17 @@
 import { reactive } from "vue";
 import type { AppearanceMode } from "./types";
 
+// Everforest — a muted, low-strain, green-forward palette (D9, [VOUCHED]). DESIGN.md is the
+// source of truth for these hex; verify.mjs pins them so theme and doc can't silently desync.
+// machud follows the macOS system appearance (D8); dark is the hero, light a faithful daylight mode.
 type ThemePalette = {
   bg: string;
+  bgLift: string;
   frame: string;
   title: string;
   text: string;
   dim: string;
+  accent: string; // primary brand green
   cpu: string;
   mem: string;
   gpu: string;
@@ -19,47 +24,48 @@ type ThemePalette = {
   bad: string;
 };
 
-// machud follows macOS appearance automatically, without adding a user-facing
-// theme setting. Per-module accent colors keep each panel recognizable in both
-// terminal background modes.
 const palettes: Record<AppearanceMode, ThemePalette> = {
   dark: {
-    bg: "#1a1b26",
-    frame: "#3b4261",
-    title: "#c0caf5",
-    text: "#a9b1d6",
-    dim: "#565f89",
+    bg: "#2d353b",
+    bgLift: "#343f44",
+    frame: "#4f5b58",
+    title: "#d3c6aa",
+    text: "#9da9a0",
+    dim: "#5c6a64",
+    accent: "#a7c080",
 
-    cpu: "#7aa2f7",
-    mem: "#bb9af7",
-    gpu: "#7dcfff",
-    disk: "#e0af68",
-    net: "#9ece6a",
-    battery: "#73daca",
-    sensor: "#f7768e",
+    cpu: "#a7c080",
+    mem: "#d699b6",
+    gpu: "#7fbbb3",
+    disk: "#dbbc7f",
+    net: "#83c092",
+    battery: "#e69875",
+    sensor: "#e67e80",
 
-    good: "#9ece6a",
-    warn: "#e0af68",
-    bad: "#f7768e",
+    good: "#a7c080",
+    warn: "#dbbc7f",
+    bad: "#e67e80",
   },
   light: {
-    bg: "#f7f8fc",
-    frame: "#b8c0d6",
-    title: "#1f2335",
-    text: "#343b58",
-    dim: "#6b7286",
+    bg: "#fdf6e3",
+    bgLift: "#f4f0d9",
+    frame: "#ddd8be",
+    title: "#5c6a72",
+    text: "#5c6a72",
+    dim: "#939f91",
+    accent: "#8da101",
 
-    cpu: "#2f63c6",
-    mem: "#8a4fb3",
-    gpu: "#0077a8",
-    disk: "#9a5b00",
-    net: "#2f7d32",
-    battery: "#00796b",
-    sensor: "#bd3f57",
+    cpu: "#8da101",
+    mem: "#df69ba",
+    gpu: "#3a94c5",
+    disk: "#dfa000",
+    net: "#35a77c",
+    battery: "#f57d26",
+    sensor: "#f85552",
 
-    good: "#2f7d32",
-    warn: "#9a5b00",
-    bad: "#bd3f57",
+    good: "#8da101",
+    warn: "#dfa000",
+    bad: "#f85552",
   },
 };
 
@@ -69,7 +75,7 @@ export function setThemeMode(mode: AppearanceMode): void {
   Object.assign(theme, palettes[mode]);
 }
 
-// Green → yellow → red as a percentage climbs. Used for load bars.
+// Green → amber → red as a percentage climbs. Used for load bars.
 export function levelColor(pct: number): string {
   if (pct >= 85) return theme.bad;
   if (pct >= 60) return theme.warn;

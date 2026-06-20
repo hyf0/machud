@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD1 — Everforest palette landed (first visual change; branch `redesign`).** Rewrote
+  `src/theme.ts` from Tokyo Night to the **Everforest** tokens (dark + light) from DESIGN.md, adding
+  `bgLift` + `accent` (the brand green). verify.mjs now **pins** the dark tokens — `#2d353b` and
+  `#a7c080` must appear in BOTH DESIGN.md and theme.ts — and asserts no Tokyo-Night leftovers, so the
+  palette can't silently desync from the spec (autonomy rule 5). `pnpm verify` PASS (44 assertions).
+  **To eyeball the green:** `node dist/machud.mjs` live, or `FORCE_COLOR=3 node dist/machud.mjs
+  --once` (confirmed `--once` emits truecolor under FORCE_COLOR — useful for RD3's color-fidelity
+  tests). Layout/glyphs unchanged — this is colour only; the 3-tier layout is RD4.
+
 - **RD0b — visual-correctness harness (branch `redesign`).** Added strip-ANSI + widest-line
   measurement to verify.mjs and the assertion that holds on current code: **no overflow at the wide
   target (widest line ≤ 120)** — the wide layout fits exactly at 120 today, so this guards any future

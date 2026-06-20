@@ -58,7 +58,11 @@ _(pick RD0 — top of Redesign.)_
   `prepack` builds on a clean tree). Acceptance: the gate actually exercises shebang byte-0 + the +x
   bit + dependency resolution; verify green. (Heavier/slower — keep it the last verify section.)
 
-- **RD1 — Reconcile DESIGN.md with code (theme + doc)** · `TODO`
+- **RD1 — Reconcile DESIGN.md with code (theme + doc)** · `DONE`
+  Done: `src/theme.ts` rewritten to the Everforest tokens (dark + light) from DESIGN.md, with
+  `bgLift` + `accent` added; verify.mjs now pins the dark tokens (`#2d353b`, `#a7c080` must appear in
+  BOTH DESIGN.md and theme.ts) and asserts no Tokyo-Night leftovers. `pnpm verify` PASS (44).
+  Eyeball: `node dist/machud.mjs` (live) or `FORCE_COLOR=3 node dist/machud.mjs --once`.
   Rewrite `src/theme.ts` to the Everforest tokens in DESIGN.md (dark/light), and **pin the hex in
   verify.mjs** (`theme.dark.accent === '#a7c080'`, `bg === '#2d353b'`, …) so doc and code can't
   desync. D4 is already reopened in decisions. Acceptance: theme matches DESIGN.md tokens; pin

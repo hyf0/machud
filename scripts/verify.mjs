@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 41;
+const MIN_CHECKS = 44;
 
 let failures = 0;
 let total = 0;
@@ -198,7 +198,21 @@ console.log("\npackaging (npx, D13)");
   );
 }
 
-// ── 7. Gate strength (strengthen-only floor) ────────────────────────────────
+// ── 7. Theme ↔ DESIGN.md (RD1) ──────────────────────────────────────────────
+console.log("\ntheme ↔ DESIGN.md");
+{
+  const { readFile } = await import("node:fs/promises");
+  const designMd = await readFile(join(root, "DESIGN.md"), "utf8");
+  const themeSrc = await readFile(join(root, "src", "theme.ts"), "utf8");
+  // DESIGN.md is the source of truth (D9); theme.ts must mirror its dark tokens so the
+  // palette can never silently desync from the spec (autonomy.md gate rule 5).
+  for (const hex of ["#2d353b", "#a7c080"]) {
+    check(designMd.includes(hex) && themeSrc.includes(hex), `theme.ts mirrors DESIGN.md dark token ${hex}`);
+  }
+  check(!/#1a1b26|#7aa2f7/.test(themeSrc), "theme.ts has no leftover Tokyo Night tokens");
+}
+
+// ── 8. Gate strength (strengthen-only floor) ────────────────────────────────
 console.log("\ngate strength");
 check(total >= MIN_CHECKS, `ran ${total} assertions ≥ pinned floor ${MIN_CHECKS} (strengthen-only)`);
 
