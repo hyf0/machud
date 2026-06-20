@@ -5,6 +5,17 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 4) — CPU top-process list (density; branch `redesign`).** Owner feedback on the live
+  frame: the CPU hero is "a big panel with little content" (Principle 8). Root cause: CPU had *less*
+  content than MEMORY, so it stretched to MEMORY's height with an empty bottom. Fix — a **top-CPU-
+  process list** (`cpu.topProcs` via `ps -A -o pcpu=,comm= -r`, mirroring memory.ts's top-by-RSS),
+  rendered as 3 right-aligned `name … N%` rows. CpuPanel now carries BigNumber + history graph + P/E
+  avg bars + per-core load grid + top processes — real, always-present, comparative data. TDD:
+  `cpu.topProcs` array check + inject a distinctive name → renders; red→green. `MIN_CHECKS` 63→65.
+  `pnpm verify` PASS (65). **Density now FLIPPED** — CPU is fuller than MEMORY, so MEM needs its
+  matching hero/breakdown/history pass next. The CPU graph reads sparse at idle (honest area chart at
+  low load; flows live). Also stamped **D15** (mac|hud wordmark VOUCHED) and removed `cool-proto.mjs`.
+
 - **RD4 (part 3) — per-core grid coloured by load (branch `redesign`).** New `CoreGrid.vue`: one
   mini-bar per core (block glyph, height ∝ load), **coloured by `levelColor` (load), not by cluster** —
   E and P render as separate labelled groups; a single cluster (Intel) → one unlabelled row, never

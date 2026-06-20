@@ -37,5 +37,10 @@ defineProps<{ cpu: CpuMetric; history: number[] }>();
     </Box>
 
     <CoreGrid :cores="cpu.cores" />
+
+    <Box v-for="p in cpu.topProcs.slice(0, 3)" :key="p.name" justifyContent="space-between">
+      <Text :color="theme.text" wrap="truncate">{{ p.name }}</Text>
+      <Text :color="theme.dim">{{ p.pct.toFixed(0) }}%</Text>
+    </Box>
   </Panel>
 </template>

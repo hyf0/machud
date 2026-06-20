@@ -1,7 +1,7 @@
 import os from "node:os";
 import { sh } from "../exec";
 import { clamp } from "../format";
-import type { CpuCore, CpuMetric } from "../../types";
+import type { CpuCore, CpuMetric, ProcCpu } from "../../types";
 
 // Per-core usage is computed from deltas between successive os.cpus() snapshots,
 // so the first sample reads as 0% and subsequent samples reflect the interval.
@@ -51,10 +51,26 @@ export async function collectCpu(): Promise<CpuMetric> {
   const eCores = cores.filter((c) => c.cluster === "E");
   const pCores = cores.filter((c) => c.cluster === "P");
 
+  // Top CPU consumers: ps sorted by current CPU% (-r); pcpu can exceed 100 across cores, names are
+  // basenamed. Mirrors memory.ts's top-by-RSS list — the hero's supporting data (DESIGN Principle 8).
+  const psOut = await sh("ps", ["-A", "-o", "pcpu=,comm=", "-r"]);
+  const topProcs: ProcCpu[] = psOut
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .slice(0, 5)
+    .map((l) => {
+      const sp = l.indexOf(" ");
+      const pctNum = Number(l.slice(0, sp));
+      const comm = l.slice(sp + 1).trim();
+      return { name: comm.split("/").pop() || comm, pct: isFinite(pctNum) ? pctNum : 0 };
+    });
+
   return {
     model,
     usage: avg(cores),
     cores,
+    topProcs,
     pUsage: avg(pCores),
     eUsage: avg(eCores),
     pCount,

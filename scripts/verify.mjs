@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 63;
+const MIN_CHECKS = 65;
 
 let failures = 0;
 let total = 0;
@@ -100,6 +100,7 @@ if (m) {
   check(inRange(m.cpu.usage, 0, 100), "cpu usage in 0–100");
   check(m.cpu.cores.every((c) => inRange(c.usage, 0, 100)), "every core usage in 0–100");
   check(typeof m.cpu.model === "string" && m.cpu.model.length > 0, "cpu model present");
+  check(Array.isArray(m.cpu.topProcs), "cpu exposes a topProcs list");
 
   // Memory
   check(m.memory.total > 0, "memory total > 0");
@@ -349,6 +350,17 @@ for (const [lvl, want] of [
   };
   const f = await run("node", [bundle, "--once"], { env });
   check(/38;2;219;188;127m▆/.test(f), "CPU per-core grid colours each core by load (mid-load → warn-tier ▆)");
+}
+{
+  // Top-process density (RD4): the CPU hero lists top CPU consumers so it EARNS its space (DESIGN
+  // Principle 8 — "a big box holding three numbers is a failure"). Inject a distinctive name → renders.
+  const env = {
+    ...process.env,
+    MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { topProcs: [{ name: "ZZTOPPROC", pct: 73 }] } }),
+    COLUMNS: "120",
+  };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("ZZTOPPROC"), "CPU hero lists top processes (density — injected name renders)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME

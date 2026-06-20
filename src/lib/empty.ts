@@ -8,6 +8,7 @@ export function emptyMetrics(): Metrics {
       model: "CPU",
       usage: 0,
       cores: [],
+      topProcs: [],
       pUsage: 0,
       eUsage: 0,
       pCount: 0,

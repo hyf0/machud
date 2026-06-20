@@ -7,10 +7,16 @@ export interface CpuCore {
   cluster: "P" | "E";
 }
 
+export interface ProcCpu {
+  name: string;
+  pct: number; // %CPU from ps (pcpu); can exceed 100 across cores
+}
+
 export interface CpuMetric {
   model: string;
   usage: number; // overall 0-100
   cores: CpuCore[];
+  topProcs: ProcCpu[]; // top CPU consumers (ps -r) — the hero's supporting list
   pUsage: number; // performance-cluster average
   eUsage: number; // efficiency-cluster average
   pCount: number;
