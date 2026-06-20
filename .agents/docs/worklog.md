@@ -5,6 +5,17 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 5) — MEM hero density: BigNumber + braille graph (branch `redesign`).** After pt4 the
+  density flipped (CPU fuller than MEMORY → MEM had the empty bottom). Brought MEMORY to tier-1 parity:
+  replaced the small `61%` with a **BigNumber** and the 1-row Sparkline with the tall **braille Graph**
+  (the same components as CPU — Principle 6 consistency), keeping the used bar, wired/swap, and top
+  apps. TDD: inject `memory.usedPct=88` + `cpu.usage=11` so only a MEM BigNumber emits the `█ █ █ █`
+  88-signature; red→green. `MIN_CHECKS` 65→66. `pnpm verify` PASS (66). Tier-1 now balanced — both
+  heroes lead with big number + history graph + bars + a 3-item list.
+  **Eyeball / next:** graphs are data-honest (MEM fills ~59%, CPU sparse at idle — both flow live).
+  Still on the RD4 list: MEM wired/compressed/app breakdown bar, GPU/DISK history, then the 3-tier
+  layout + stability (fixed rows / right-aligned numeric columns).
+
 - **RD4 (part 4) — CPU top-process list (density; branch `redesign`).** Owner feedback on the live
   frame: the CPU hero is "a big panel with little content" (Principle 8). Root cause: CPU had *less*
   content than MEMORY, so it stretched to MEMORY's height with an empty bottom. Fix — a **top-CPU-

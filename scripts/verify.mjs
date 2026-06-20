@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 65;
+const MIN_CHECKS = 66;
 
 let failures = 0;
 let total = 0;
@@ -361,6 +361,18 @@ for (const [lvl, want] of [
   };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("ZZTOPPROC"), "CPU hero lists top processes (density — injected name renders)");
+}
+{
+  // MEM hero density (RD4): the MEMORY panel leads with a BigNumber too (tier-1 parity with CPU,
+  // Principle 6 consistency). Inject memory.usedPct=88 with cpu.usage=11 → only a MEM BigNumber can
+  // emit the "█ █ █ █" 88-signature (CPU shows 11; the MEM graph/bars don't use spaced blocks).
+  const env = {
+    ...process.env,
+    MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { usage: 11 }, memory: { usedPct: 88 } }),
+    COLUMNS: "120",
+  };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("█ █ █ █"), "MEMORY hero renders a BigNumber (injected 88 → block figures)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME

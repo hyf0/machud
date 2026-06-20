@@ -2,9 +2,10 @@
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
-import Sparkline from "../Sparkline.vue";
+import BigNumber from "../BigNumber.vue";
+import Graph from "../Graph.vue";
 import { theme } from "../../theme";
-import { pct, humanBytes } from "../../lib/format";
+import { humanBytes } from "../../lib/format";
 import type { MemoryMetric } from "../../types";
 
 defineProps<{ memory: MemoryMetric; history: number[] }>();
@@ -20,11 +21,11 @@ const pressureColor = (p: MemoryMetric["pressure"]) =>
     </template>
 
     <Box justifyContent="space-between">
-      <Text :color="theme.mem" bold>{{ pct(memory.usedPct) }}</Text>
+      <BigNumber :value="memory.usedPct" suffix="%" :color="theme.mem" />
       <Text :color="pressureColor(memory.pressure)">{{ memory.pressure }}</Text>
     </Box>
 
-    <Sparkline :values="history" :max="100" :color="theme.mem" />
+    <Graph :values="history" :max="100" :height="4" :color="theme.mem" />
 
     <Box>
       <Text :color="theme.dim">used </Text>
