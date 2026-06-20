@@ -12,7 +12,9 @@ anything to eyeball. Newest first.
   `inRange(null)=false` now vs the old `true`. (b) The build check passed on a stale bundle even when
   the build failed — now `rm`s `dist/machud.mjs` before building, so a failed build leaves it absent →
   red. (c) Added an assertion-count pin (`MIN_CHECKS=40`) so deleting/loosening a check turns the gate
-  red, making autonomy.md's strengthen-only rule machine-enforced. `pnpm verify` PASS (41 assertions).
+  red, making autonomy.md's strengthen-only rule machine-enforced. `pnpm verify` PASS (40 assertions;
+  the pin reads the pre-increment count). Also made the gate Intel-tolerant (no-P/E-split) and a build
+  failure now exits with one clean red instead of a cascade.
   Filed **RD0d** for the heavier real-`npx` pack→install→exec gate (from the Task-2 review).
 
 - **Task 2 — `npx machud` runnable (D13; branch `redesign`).** Made the package publishable and the

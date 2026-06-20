@@ -53,9 +53,15 @@ console.log("build");
 // check goes red — instead of silently passing on a stale artifact.
 const { rm } = await import("node:fs/promises");
 await rm(bundle, { force: true });
-const buildOut = await run("pnpm", ["build"]);
-check(await fileExists(bundle), "bundle builds fresh (no stale-pass)");
-void buildOut;
+await run("pnpm", ["build"]);
+const built = await fileExists(bundle);
+check(built, "bundle builds fresh (no stale-pass)");
+if (!built) {
+  // Build failed → no bundle. Stop here with ONE clear red instead of a cascade of
+  // downstream failures (json-parse, every panel, the count pin) that bury the cause.
+  console.log("\n\x1b[31mverify: FAIL — build produced no dist/machud.mjs (see build output above)\x1b[0m\n");
+  process.exit(1);
+}
 
 // ── 2. JSON snapshot: structural + range invariants ─────────────────────────
 console.log("\ndata (--json)");
@@ -76,7 +82,10 @@ if (m) {
 
   // CPU
   check(Array.isArray(m.cpu.cores) && m.cpu.cores.length > 0, "cpu has cores");
-  check(m.cpu.pCount + m.cpu.eCount === m.cpu.cores.length, "cpu P+E counts match core list");
+  check(
+    m.cpu.pCount + m.cpu.eCount === m.cpu.cores.length || (m.cpu.pCount === 0 && m.cpu.eCount === 0),
+    "cpu P+E counts match core list (or no P/E split — Intel single cluster)",
+  );
   check(inRange(m.cpu.usage, 0, 100), "cpu usage in 0–100");
   check(m.cpu.cores.every((c) => inRange(c.usage, 0, 100)), "every core usage in 0–100");
   check(typeof m.cpu.model === "string" && m.cpu.model.length > 0, "cpu model present");
