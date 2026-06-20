@@ -215,8 +215,8 @@ hierarchy** — important up top, minor compressed below:
   (CPU% / MEM% / BAT%). The hierarchy IS the degradation order — the least-important tier drops
   first, hero last. *(Marcotte responsive grids; Wroblewski mobile-first; Walton content choreography.)*
 - **Auto-adapt to viewport, like D8 adapts to appearance** — not user config, still zero-config (D1).
-- **Width-seam caveat:** `useWindowSize()` is reactive (reads `stdout.columns`, falls back to 80
-  only when piped/non-TTY), and `App.vue` already binds it as the width. The catch is the
+- **Width-seam caveat:** `useWindowSize()` is reactive (reads `stdout.columns`, then a
+  terminal-size probe, falling back to 80 only as a last resort), and `App.vue` already binds it as the width. The catch is the
   `--once`/verify path has no TTY width, so the gate drives width via `COLUMNS` →
   `renderToString({columns})` (main.ts already does this). RD5 must make the responsive `v-if` read
   that **same** width (thread `columns` as a prop), so the breakpoint asserted at COLUMNS=40/120 is
@@ -246,11 +246,12 @@ hierarchy** — important up top, minor compressed below:
   real-time charge power** = `Voltage(mV) × Amperage(mA) / 1e6` W. **Unsigned-int trap:** ioreg
   returns `Amperage` as an **unsigned 64-bit** value, so reinterpret as signed
   (`a = raw >= 2**63 ? raw - 2**64 : raw`) **before** the sign test — only then `a < 0` =
-  discharging. (`battery.ts`'s `(-?\d+)` parse does NOT handle this — RD2 fixes it; RD0c injects the
-  wraparound value e.g. `18446744073709551179` = −437 mA so the gate proves the reinterpretation.)
+  discharging. (`battery.ts`'s `(-?\d+)` parse does NOT handle this — **RD2** fixes it and injects
+  the wraparound value e.g. `18446744073709551179` = −437 mA, via RD0c's injection mechanism, so the
+  gate proves the reinterpretation.)
   When `|a| ≈ 0` while charged, show **"charged"**, not "0W". This is battery
   charge wattage, NOT total system draw (that needs `sudo` → omitted). Verify can't see
-  on-battery/charging transitions on one host → fixture-tested (RD0c) + manual review of the sign path.
+  on-battery/charging transitions on one host → fixture-tested in **RD2** (via RD0c's mechanism) + manual review of the sign path.
 - **DISK — tier-3 strip.** Used % + free, compact. A **state signifier** that is *earned*:
   neutral when roomy; `levelColor`-driven bar + a `NEAR FULL`/`FULL` text token at ≥85% / ≥95%.
   (Today DiskPanel hardcodes the disk hue and wires no levelColor — RD3 fix.)

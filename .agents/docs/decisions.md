@@ -55,8 +55,8 @@ compatible with D1.
   ONE narrow/watch-face single-column fallback, with a single tested breakpoint. The full
   5-breakpoint × per-panel-S/M/L ladder is rejected as a scope bomb for the hands-off loop.
 - **Build it LAST**, after the visual redesign (RD5), and gate it on the verify width assertions.
-- **Mind the width seam:** `useWindowSize()` is reactive — it reads `stdout.columns` and only
-  falls back to 80 when piped/non-TTY; `App.vue` already binds it as the width. The real issue is
+- **Mind the width seam:** `useWindowSize()` is reactive — it reads `stdout.columns`, then a
+  terminal-size probe, falling back to 80 only as a last resort; `App.vue` already binds it as the width. The real issue is
   that the `--once`/verify path has no TTY width, so the gate drives width via `COLUMNS` →
   `renderToString({columns})` (which `main.ts` already does). RD5 must make any responsive `v-if`
   read the **same** width the gate controls (thread `columns` as a prop), so a breakpoint asserted
