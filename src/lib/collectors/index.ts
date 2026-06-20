@@ -31,5 +31,29 @@ export async function collectAll(): Promise<Metrics> {
     safe(collectSensors(), e.sensors),
     safe(collectAppearance(), e.appearance),
   ]);
-  return { cpu, memory, gpu, disk, net, battery, sensors, appearance, ts: Date.now() };
+  const snapshot: Metrics = { cpu, memory, gpu, disk, net, battery, sensors, appearance, ts: Date.now() };
+  return applyTestOverride(snapshot);
+}
+
+// Test-only injection hook (sibling of MACHUD_TEST_APPEARANCE): MACHUD_TEST_OVERRIDE is a
+// JSON object deep-merged into the snapshot, letting the verify gate exercise states this
+// host can't produce (on-battery watts, high memory pressure, Intel single-cluster,
+// near-full disk). Never set in the product path, so real use is unaffected.
+function applyTestOverride(m: Metrics): Metrics {
+  const raw = process.env.MACHUD_TEST_OVERRIDE;
+  if (!raw) return m;
+  try {
+    return deepMerge(m, JSON.parse(raw));
+  } catch {
+    return m;
+  }
+}
+
+function deepMerge<T>(base: T, over: unknown): T {
+  if (over === null || typeof over !== "object" || Array.isArray(over)) return over as T;
+  const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const [k, v] of Object.entries(over as Record<string, unknown>)) {
+    out[k] = deepMerge((base as Record<string, unknown> | undefined)?.[k], v);
+  }
+  return out as T;
 }

@@ -41,7 +41,13 @@ _(pick RD0 — top of Redesign.)_
   "no `⚡`" before RD3 removes it, or "bars aligned" before RD4 builds them): **no-`⚡` + FORCE_COLOR
   fallback → RD3; per-panel bar alignment → RD4; no-overflow at narrow widths (40/60) → RD5.**
 
-- **RD0c — Verify fixture / override hooks (mechanism only)** · `TODO`
+- **RD0c — Verify fixture / override hooks (mechanism only)** · `DONE`
+  Done: `collectAll()` now applies `MACHUD_TEST_OVERRIDE` (a JSON env, deep-merged into the snapshot,
+  product path unaffected when unset) — a sibling of `MACHUD_TEST_APPEARANCE`. verify exercises it:
+  inject `memory.pressure="High"` → asserts it surfaces. `pnpm verify` PASS (45). RD2 uses this for the
+  battery-sign / pressure / Intel / near-full-disk fixtures. (Note: metric-level override proves the
+  gate can inject a STATE; to prove a collector reads the *real* sysctl, RD2 adds a collector-level
+  test hook where that provenance matters.)
   The gate runs on one host in one state, so it can never see on-battery / charging / high memory
   pressure / Intel / near-full disk. Build a documented **synthetic-input injection mechanism**
   (generalize the existing `MACHUD_TEST_APPEARANCE` precedent). Acceptance (self-contained — does

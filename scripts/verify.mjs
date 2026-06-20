@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 44;
+const MIN_CHECKS = 45;
 
 let failures = 0;
 let total = 0;
@@ -236,7 +236,23 @@ console.log("\ntheme ↔ DESIGN.md");
   check(!/#1a1b26|#7aa2f7/i.test(themeSrc), "theme.ts has no leftover Tokyo Night tokens");
 }
 
-// ── 8. Gate strength (strengthen-only floor) ────────────────────────────────
+// ── 8. Test-injection mechanism (RD0c) ──────────────────────────────────────
+// Generalizes the MACHUD_TEST_APPEARANCE hook: a JSON env override deep-merged into the
+// snapshot, so the gate can exercise states this host can't produce (RD2 uses it for
+// on-battery watts / high memory pressure / Intel / near-full disk). Not a product surface.
+console.log("\ntest injection (RD0c)");
+{
+  const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ memory: { pressure: "High" } }) };
+  let injected = null;
+  try {
+    injected = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(injected?.memory?.pressure === "High", "MACHUD_TEST_OVERRIDE deep-merges a synthetic value into the snapshot");
+}
+
+// ── 9. Gate strength (strengthen-only floor) ────────────────────────────────
 console.log("\ngate strength");
 check(total >= MIN_CHECKS, `ran ${total} assertions ≥ pinned floor ${MIN_CHECKS} (strengthen-only)`);
 

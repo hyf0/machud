@@ -5,6 +5,13 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD0c — synthetic-input injection mechanism (branch `redesign`).** `collectAll()` now applies
+  `MACHUD_TEST_OVERRIDE` — a JSON env deep-merged into the snapshot (sibling of
+  `MACHUD_TEST_APPEARANCE`; product path untouched when unset) — so the gate can exercise states this
+  host can't produce. TDD: added the verify assertion (inject `memory.pressure="High"` → red while
+  unbuilt), implemented the deep-merge → green. `pnpm verify` PASS (45). RD2 will use this for the
+  battery-sign / pressure-level / Intel / near-full-disk fixtures.
+
 - **RD1 — Everforest palette landed (first visual change; branch `redesign`).** Rewrote
   `src/theme.ts` from Tokyo Night to the **Everforest** tokens (dark + light) from DESIGN.md, adding
   `bgLift` + `accent` (the brand green). verify.mjs now **pins** the dark tokens — `#2d353b` and
