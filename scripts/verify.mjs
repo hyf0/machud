@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 45;
+const MIN_CHECKS = 46;
 
 let failures = 0;
 let total = 0;
@@ -250,6 +250,18 @@ console.log("\ntest injection (RD0c)");
     /* parse fail → assertion fails */
   }
   check(injected?.memory?.pressure === "High", "MACHUD_TEST_OVERRIDE deep-merges a synthetic value into the snapshot");
+}
+{
+  // Provenance (RD2): prove memory.ts reads the REAL kern.memorystatus_vm_pressure_level
+  // (1/2/4), not the usedPct heuristic — inject level 4 and require High (heuristic gives Normal here).
+  const env = { ...process.env, MACHUD_TEST_PRESSURE_LEVEL: "4" };
+  let j = null;
+  try {
+    j = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(j?.memory?.pressure === "High", "memory pressure from the real sysctl level (4 → High, not heuristic)");
 }
 
 // ── 9. Gate strength (strengthen-only floor) ────────────────────────────────

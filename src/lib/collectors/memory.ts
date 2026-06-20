@@ -35,8 +35,26 @@ export async function collectMemory(): Promise<MemoryMetric> {
   const swapTotal = parseSwap(swap, "total");
   const swapUsed = parseSwap(swap, "used");
 
+  // macOS memory pressure — the real kernel signal (1=normal, 2=warn, 4=critical), the same
+  // thing Activity Monitor's Memory Pressure graph reflects. Zero-sudo. Falls back to a
+  // usedPct/swap heuristic only when the sysctl is unavailable (non-mac / unreadable).
+  // MACHUD_TEST_PRESSURE_LEVEL is a test-only input hook (see verify.mjs); unset in production.
+  const lvl = (
+    process.env.MACHUD_TEST_PRESSURE_LEVEL ??
+    (await sh("sysctl", ["-n", "kern.memorystatus_vm_pressure_level"]))
+  ).trim();
   const pressure: MemoryMetric["pressure"] =
-    usedPct >= 88 || swapUsed > 2 ** 30 ? "High" : usedPct >= 72 ? "Elevated" : "Normal";
+    lvl === "4"
+      ? "High"
+      : lvl === "2"
+        ? "Elevated"
+        : lvl === "1"
+          ? "Normal"
+          : usedPct >= 88 || swapUsed > 2 ** 30
+            ? "High"
+            : usedPct >= 72
+              ? "Elevated"
+              : "Normal";
 
   // Top memory consumers: ps sorted by resident size (-m), rss is in KiB.
   const ps = await sh("ps", ["-A", "-o", "rss=,comm=", "-m"]);
