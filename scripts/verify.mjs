@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 53;
+const MIN_CHECKS = 55;
 
 let failures = 0;
 let total = 0;
@@ -136,6 +136,7 @@ check(!/NaN|undefined/.test(frame), "frame has no NaN/undefined");
 const stripAnsi = (s) => s.replace(/\x1b\[[0-9;]*m/g, "");
 const widest = Math.max(0, ...frame.split("\n").map((l) => [...stripAnsi(l)].length));
 check(widest <= 120, `no overflow at wide target (widest line ${widest} ≤ 120)`);
+check(!frame.includes("⚡"), "no ⚡ emoji in the frame (charge state uses ⇡/⇣)");
 
 // ── 4. Appearance modes ────────────────────────────────────────────────────
 console.log("\nappearance");
@@ -304,6 +305,13 @@ for (const [lvl, want] of [
     j?.cpu?.eCount === 0 && j?.cpu?.pCount === j?.cpu?.cores?.length && j.cpu.pCount > 0,
     "cpu models a single cluster when no P/E split (Intel — never 0P+0E)",
   );
+}
+{
+  // Status glyph (RD3): a High pressure level must render the ● alert glyph — status carried
+  // on a non-hue channel (color-blind safe; DESIGN.md Principle 2).
+  const env = { ...process.env, MACHUD_TEST_PRESSURE_LEVEL: "4", COLUMNS: "120" };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("●"), "status carries a non-hue glyph (● on High memory pressure)");
 }
 
 // ── 9. Gate strength (strengthen-only floor) ────────────────────────────────

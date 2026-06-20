@@ -27,7 +27,7 @@ const clock = computed(() => {
       <Text :color="theme.dim"> · </Text>
       <Text :color="theme.gpu">GPU {{ pct(m.gpu.usage) }}</Text>
       <Text :color="theme.dim"> · </Text>
-      <Text :color="theme.battery">BAT {{ pct(m.battery.pct) }}{{ m.battery.charging ? "⚡" : "" }}</Text>
+      <Text :color="theme.battery">BAT {{ pct(m.battery.pct) }}{{ m.battery.charging ? " ⇡" : "" }}</Text>
       <Text :color="theme.dim"> · </Text>
       <Text :color="theme.title" bold>{{ clock }}</Text>
     </Box>

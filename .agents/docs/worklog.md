@@ -5,6 +5,14 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD3 (part 1) — status glyphs + ⚡→⇡ (branch `redesign`).** Added a `statusGlyph()` helper
+  (`○` calm / `◐` elevated / `● ` alert) and wired it into MemoryPanel (pressure) and SensorsPanel
+  (thermal), so status now rides a **non-hue channel** (color-blind safe, DESIGN.md Principle 2) —
+  not colour alone. Replaced the last two `⚡` (BatteryPanel + HeaderBar) with `⇡`. verify now asserts
+  **no `⚡` anywhere in the frame** and **`●` renders on High** pressure (injected via the RD0c hook).
+  `pnpm verify` PASS (55). Remaining RD3: gradient Meter, braille Graph, BigNumber, DiskPanel
+  near-full ramp, D11 colour-tier fallback.
+
 - **RD2 review fixes (branch `redesign`).** The data-honesty review (verdict fix) found the data
   layer solid but two visible product defects: (1) the charging detector matched "disCHARGING"
   (`/charging/i` with no word boundary), so the panel showed "⚡ charging" while discharging —

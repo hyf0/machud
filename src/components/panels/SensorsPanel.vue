@@ -4,7 +4,7 @@ import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
 import { theme } from "../../theme";
-import { temp } from "../../lib/format";
+import { temp, statusGlyph } from "../../lib/format";
 import type { SensorsMetric } from "../../types";
 
 const props = defineProps<{ sensors: SensorsMetric }>();
@@ -22,7 +22,7 @@ const pressureColor = computed(() =>
   <Panel title=" SENSORS" :accent="theme.sensor" :minWidth="24">
     <Box justifyContent="space-between">
       <Text :color="theme.dim">thermal</Text>
-      <Text :color="pressureColor" bold>{{ sensors.thermalPressure }}</Text>
+      <Text :color="pressureColor" bold>{{ statusGlyph(sensors.thermalPressure) }} {{ sensors.thermalPressure }}</Text>
     </Box>
 
     <Box>

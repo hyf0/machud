@@ -4,7 +4,7 @@ import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
 import Sparkline from "../Sparkline.vue";
 import { theme } from "../../theme";
-import { pct, humanBytes } from "../../lib/format";
+import { pct, humanBytes, statusGlyph } from "../../lib/format";
 import type { MemoryMetric } from "../../types";
 
 defineProps<{ memory: MemoryMetric; history: number[] }>();
@@ -21,7 +21,7 @@ const pressureColor = (p: MemoryMetric["pressure"]) =>
 
     <Box justifyContent="space-between">
       <Text :color="theme.mem" bold>{{ pct(memory.usedPct) }}</Text>
-      <Text :color="pressureColor(memory.pressure)">{{ memory.pressure }}</Text>
+      <Text :color="pressureColor(memory.pressure)">{{ statusGlyph(memory.pressure) }} {{ memory.pressure }}</Text>
     </Box>
 
     <Sparkline :values="history" :max="100" :color="theme.mem" />
