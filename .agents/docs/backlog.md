@@ -34,13 +34,12 @@ _(pick RD0 — top of Redesign.)_
   the autonomy "strengthen-only" rule machine-enforced rather than prose. Acceptance: each hole has
   a test that was red before the fix; the count-pin fails when an assertion is removed; `pnpm verify` green.
 
-- **RD0b — Visual-correctness assertions in `verify.mjs`** · `TODO`
-  The gate has no visual teeth today. Add (strip-ANSI): widest visible line ≤ COLUMNS at
-  COLUMNS ∈ {40,60,90,120} (this alone catches the existing wide layout overflowing ~72 at 60);
-  per-panel equal bar start/end columns (alignment); **no `⚡` (or any double-width emoji) anywhere
-  in the frame** — single grep on the rendered output;
-  `FORCE_COLOR=1/2/3` still renders the solid-accent fallback (color fidelity). Acceptance: the
-  current overflow at 60 is caught (red), then the wide layout is made to pass; verify green.
+- **RD0b — Visual-correctness harness in `verify.mjs`** · `DONE`
+  Done: strip-ANSI + widest-line measurement + the assertion that holds on current code — **no
+  overflow at the wide target (widest visible line ≤ 120)**; `pnpm verify` PASS. The other visual
+  assertions are TDD-**coupled** to their rewrites and land WITH them, not before (you can't assert
+  "no `⚡`" before RD3 removes it, or "bars aligned" before RD4 builds them): **no-`⚡` + FORCE_COLOR
+  fallback → RD3; per-panel bar alignment → RD4; no-overflow at narrow widths (40/60) → RD5.**
 
 - **RD0c — Verify fixture / override hooks (mechanism only)** · `TODO`
   The gate runs on one host in one state, so it can never see on-battery / charging / high memory

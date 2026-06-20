@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 40;
+const MIN_CHECKS = 41;
 
 let failures = 0;
 let total = 0;
@@ -123,6 +123,12 @@ for (const title of ["CPU", "MEMORY", "GPU", "DISK", "NETWORK", "BATTERY", "SENS
 }
 check(/\d\d:\d\d:\d\d/.test(frame), "header clock renders (HH:MM:SS)");
 check(!/NaN|undefined/.test(frame), "frame has no NaN/undefined");
+// Visual-correctness harness (RD0b): no rendered line may exceed the wide target.
+// Feature-coupled visual assertions (alignment, no-⚡, narrow widths, FORCE_COLOR
+// fallback) land WITH their features in RD3/RD4/RD5 — see backlog.
+const stripAnsi = (s) => s.replace(/\x1b\[[0-9;]*m/g, "");
+const widest = Math.max(0, ...frame.split("\n").map((l) => [...stripAnsi(l)].length));
+check(widest <= 120, `no overflow at wide target (widest line ${widest} ≤ 120)`);
 
 // ── 4. Appearance modes ────────────────────────────────────────────────────
 console.log("\nappearance");

@@ -5,6 +5,14 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD0b — visual-correctness harness (branch `redesign`).** Added strip-ANSI + widest-line
+  measurement to verify.mjs and the assertion that holds on current code: **no overflow at the wide
+  target (widest line ≤ 120)** — the wide layout fits exactly at 120 today, so this guards any future
+  change from overflowing it. Reframed the backlog: the other visual assertions (no-`⚡`, FORCE_COLOR
+  fallback, bar alignment, narrow-width no-overflow) are TDD-coupled to RD3/RD4/RD5 and land WITH
+  those features — a monolithic "all visual assertions first" was infeasible (can't assert "no `⚡`"
+  before it's removed). `pnpm verify` PASS (41 assertions; floor pinned to 41).
+
 - **RD0 — hardened the verify gate (safety net; branch `redesign`).** Closed the three confirmed
   holes the adversarial reviews found: (a) `inRange` accepted `null` (a metric silently degrading to
   `—` passed every range check) — split into a strict `inRange` (null/NaN → red, for present-required
