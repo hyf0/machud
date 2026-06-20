@@ -5,6 +5,42 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **QA review applied + D9/D13 vouched (docs only; branch `redesign`).** Ran a consolidation-QA
+  adversarial review (4 auditors + a Codex pass) over the redesign docs; it returned `fix-then-lock`
+  and caught a BLOCKING miss + 2 factual errors I'd carried in. Fixed all on branch `redesign`:
+  (BLOCKING) `autonomous-development-plan.md` still hardcoded the old B2→B3→B4 order — replaced with
+  a pointer to backlog.md; `architecture.md` Layers/source-table now tagged SHIPPED-vs-TARGET (3-row
+  grid + IP); corrected the **`useWindowSize` "constant 80"** claim in 4 files (it's reactive; the
+  real seam is the gate's `COLUMNS`→`renderToString` width); corrected the **battery sign** spec —
+  ioreg `Amperage` is an unsigned 64-bit int, reinterpret before the `<0` test; made RD2 acceptance
+  provenance-distinguishing, broke RD0c's circular dependency, and added a gate-strength count-pin to
+  RD0. **Vouched D9 (Everforest visual identity) and D13 (`npx machud` zero-install distribution)**
+  with `[VOUCHED @hyf0]`, added both to the autonomy stop-list. **`pnpm verify` PASS (unchanged —
+  docs only).** Next: re-run adversarial review on this fix, then RD0.
+
+- **Design session — visual identity + redesign plan (docs only; no code change yet).**
+  Settled machud's look as "**cool but refined**" (drama from FORM, calm from COLOR), palette
+  **Everforest** green-forward, and wrote it up as [`/DESIGN.md`](../../DESIGN.md) — the hands-off
+  aesthetic anchor (D9). Decisions this round: **sudo dropped entirely** (D2 strengthened, B5
+  DROPPED — "never asks for your password" is now identity); **opinionated contribution policy**
+  ([`/CONTRIBUTING.md`](../../CONTRIBUTING.md), D10); **3-tier layout** (tier-1 CPU+Memory; tier-2
+  Network/GPU/Battery; tier-3 status strip) with **responsive reopened** (D4 — owner reopened,
+  scoped to 2-tier, built last); **truecolor color-tier fallback** (D11); **no-IP waiver** (D12).
+  Per-module spec set: real memory-pressure sysctl, live battery adapter/charge watts, per-core
+  P/E (Apple-Silicon-only), network human units + no IP, status carried on `○/◐/●` glyphs
+  (color-blind safe).
+  Ran TWO adversarial multi-agent reviews. The second one found the conclusions were **not safe to
+  lock as-is** — DESIGN.md claimed `theme.ts` mirrored Everforest (it's still Tokyo Night), still
+  encoded "fixed 3-row / no responsive," and the redesign was never in the backlog; plus three
+  live verify holes (`inRange(null)→true`, build-passes-on-stale-bundle, no strengthen-only). Acted
+  on all of it: reconciled DESIGN.md (marked TARGET vs shipped, fixed the contradictions), and
+  **restaged the backlog RD0–RD5 safety-net-first** so the loop hardens `verify.mjs` BEFORE any
+  visual rewrite. Added gate-integrity rules to autonomy.md (strengthen-only, responsive must be
+  render-tested, TARGET≠shipped).
+  **No `src/` changed; `pnpm verify` NOT re-run (nothing to verify yet).** A throwaway truecolor
+  prototype `cool-proto.mjs` was added to choose the palette (delete after RD3). **To eyeball:**
+  `node cool-proto.mjs` (Everforest dark = flavor 4, light = flavor 7).
+
 - **Autonomous development plan added.** Added
   `autonomous-development-plan.md` as the owner/agent handoff file: what the owner
   needs to decide, the agent operating loop, stop conditions, current execution

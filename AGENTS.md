@@ -6,6 +6,10 @@ A beautiful, zero-config terminal system monitor for macOS — a TUI reimagining
 machud is opinionated and out-of-the-box: a curated wide-screen dashboard with
 Apple-Silicon-aware panels.
 
+> **Contributing:** machud is opinionated by design. Bug reports are welcome; **feature PRs
+> opened without a prior, agreed-upon issue are closed directly**, and theming/feature/aesthetic
+> changes are generally not accepted. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Run it
 
 ```bash

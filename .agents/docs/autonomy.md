@@ -13,7 +13,8 @@ asynchronously, not in the loop.
 
 **Stop and ask ONLY when:**
 - a change would cross a `[VOUCHED @hyf0]` decision in decisions.md (currently
-  **D1** not-configurable, **D7** terminal takeover) — these are settled;
+  **D1** not-configurable, **D7** terminal takeover, **D9** Everforest visual identity,
+  **D13** `npx machud` zero-install distribution) — these are settled;
 - an action is **outward-facing or irreversible**: `git push`, publishing,
   deleting the user's data, anything that leaves this machine/repo;
 - the work genuinely can't proceed without a human ruling (a real fork in intent,
@@ -53,7 +54,9 @@ A change is "done" only when ALL hold:
 1. The relevant TDD/verification step was added or consciously marked not
    applicable under the exceptions above.
 2. `pnpm verify` is **green** (build + data ranges + all panels + altscreen).
-3. No new `—`/null for a metric that was previously live (no silent regression).
+3. No new `—`/null for a metric that was previously live (no silent regression). **Exception:** a
+   previously-live metric may be dropped only via a logged waiver recorded in decisions.md (e.g.
+   **D12**, the LAN IP) and tagged `GATE WEAKENED` in the worklog — never silently.
 4. Any affected PCR record (decisions / architecture / backlog) updated in the
    same change — a stale record is a trap.
 5. The worklog (below) has an entry for what changed and why.
@@ -69,6 +72,29 @@ renders without NaN/undefined, and drives a PTY to confirm the alternate-screen
 takeover. **Extend it whenever you add a module or invariant** — a new panel must
 get a "renders" assertion; a new metric must get a range assertion. The gate is
 only as good as its coverage.
+
+## Gate integrity & redesign rules (2026-06-20, from the adversarial review)
+
+The verify gate is the ONLY safety net under minimal review, and it currently has holes. These
+rules are non-negotiable for the RD-series redesign:
+
+1. **Safety net first.** Do **not** optimize against the gate until the gate is honest. Land
+   **RD0 → RD0b → RD0c** (range-null fix, fresh-build check, strengthen-only snapshot, visual
+   no-overflow/alignment/color-fidelity assertions, fixture hooks) **before** any visual rewrite.
+2. **Assertions are strengthen-only.** You may ADD checks freely. You must **STOP and ask** before
+   deleting a check, loosening a range, or flipping a present-required value to nullable. Tag any
+   deliberate loosening `GATE WEAKENED` in the worklog so it's an eyeball item, never a silent edit.
+3. **Responsive must be render-tested.** verify.mjs must render at the wide and narrow breakpoints
+   and assert: widest visible line ≤ COLUMNS, hero present at wide / absent at watch-face,
+   alignment holds where bars render. The gate already controls width via `COLUMNS` →
+   `renderToString({columns})` (main.ts); RD5 must make the responsive `v-if` read that same width
+   (thread `columns` as a prop) — `useWindowSize()` is reactive in a TTY but the verify path has no
+   TTY width, so the branch must read the gate-controlled width, not a live-only source. See D4.
+4. **TARGET ≠ shipped.** `DESIGN.md` is mostly a TARGET; the code hasn't implemented it. A "panel
+   renders" grep is NOT "matches DESIGN.md." Build toward the target via the staged backlog; never
+   treat unbuilt DESIGN.md prose as a passing invariant.
+5. **theme ↔ doc pin.** The DESIGN.md color tokens and `src/theme.ts` must stay identical, pinned
+   by a verify assertion, so they can never silently diverge.
 
 ## Worklog & open questions (async review surface)
 

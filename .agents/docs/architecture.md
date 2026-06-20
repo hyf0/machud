@@ -12,7 +12,8 @@ This record captures the durable *why* behind the structure and the data sources
 src/
   main.ts                 entry — interactive mount (alternateScreen: takes over the
                           terminal like btop, restores shell on quit), OR `--once` snapshot
-  App.vue                 wide-screen dashboard layout (fixed 3-row grid)
+  App.vue                 SHIPPED: flat 3-row grid. TARGET: DESIGN.md 3-tier + 2-tier
+                          responsive (RD4/RD5) — don't treat the 3-row grid as the contract
   theme.ts                system-following light/dark palettes + levelColor()
   types.ts                Metrics shapes (one interface per module)
   composables/
@@ -44,7 +45,7 @@ Goal: open-the-box, no password prompt. Everything below is unprivileged.
 | Memory   | `vm_stat` (pages), `sysctl vm.swapusage`, `ps -A -o rss,comm -m` (top apps) |
 | GPU      | `ioreg -c IOAccelerator` → PerformanceStatistics "Device Utilization %"    |
 | Disk     | `df -k -P /`; `ioreg -c IOBlockStorageDriver` "Bytes (Read/Write)" diffed  |
-| Network  | `route get default` + `netstat -ibn` byte counters diffed; `os.networkInterfaces()` for IP |
+| Network  | `route get default` + `netstat -ibn` byte counters diffed; `os.networkInterfaces()` (IP collected today but NOT displayed — dropped per D12; collector field removed in RD2) |
 | Battery  | `pmset -g batt`; `ioreg -c AppleSmartBattery` (CycleCount, capacities, Temperature) |
 | Sensors  | `pmset -g therm` (CPU speed cap → thermal pressure); battery pack temp     |
 | Appearance | `defaults read -g AppleInterfaceStyle` (`Dark` = dark; absent/empty = light) |
@@ -63,8 +64,9 @@ Goal: open-the-box, no password prompt. Everything below is unprivileged.
   is no user-facing theme switch; `MACHUD_TEST_APPEARANCE` exists only so
   `pnpm verify` can exercise both palettes without changing host settings.
 
-An "enhanced mode" (opt-in `sudo powermetrics`) could later light up precise
-per-cluster load, GPU/ANE watts, fan RPM, and die temps. Not built yet.
+There is **no** "enhanced mode." A sudo/powermetrics path was considered and **dropped** (D2,
+2026-06-20): precise per-cluster load, GPU/ANE watts, fan RPM, die temps, and total system power
+stay `—` forever. Never asking for a password is part of the product.
 
 ## Verification
 
@@ -74,7 +76,16 @@ data, renders one frame, exits. No TTY needed.
 
 ## Scope status
 
-Done: CPU (P/E), Memory, GPU, Disk, Network, Battery, Sensors, Clock (header),
-system-following light/dark appearance.
-Deferred from the 9-module Stats parity goal: **Bluetooth**, a standalone **Clock**
-module, and **responsive layout** (wide-screen only for now, by decision).
+Shipped: CPU (P/E), Memory, GPU, Disk, Network, Battery, Sensors, Clock (header),
+system-following light/dark appearance, `pnpm verify` gate, alternate-screen takeover.
+
+**In progress — the visual redesign** (see [`/DESIGN.md`](../../DESIGN.md), the aesthetic anchor;
+D9). It moves machud to a "cool but refined" Everforest identity with a 3-tier layout, and is
+staged RD0–RD5 (safety-net-first) in [backlog.md](./backlog.md). New collectors it adds:
+**memory pressure** (`sysctl kern.memorystatus_vm_pressure_level`), **battery adapter + charge
+watts** (`AdapterDetails.Watts`; `Voltage·Amperage/1e6`). New rendering concerns: a **truecolor
+color-tier fallback** (D11 — Terminal.app is 256-color) and an **Apple-Silicon/Intel P/E branch**.
+
+Decisions changed this round: **responsive reopened** (D4 — 2-tier, auto-adapt like D8, built
+last); **sudo dropped** (D2). Still deferred from 9-module Stats parity: **Bluetooth**, a
+standalone **Clock** module (both after the redesign).

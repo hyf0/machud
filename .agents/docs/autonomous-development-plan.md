@@ -71,25 +71,14 @@ default, record it if it matters, and keep moving.
 
 ## Current execution plan
 
-Unless the owner reorders [backlog.md](./backlog.md), work proceeds top-down:
+**The single source of work order is [backlog.md](./backlog.md) — pull from the top.** Do NOT
+duplicate the list here (a pointer can't desync; a copied list can — and did).
 
-1. **B2 — Bluetooth panel**
-   - First add verification for a `bluetooth` metrics shape and rendered panel.
-   - Capture/read real `system_profiler SPBluetoothDataType` output before parser
-     changes, per D6.
-   - Implement a safe empty state for Macs with no connected Bluetooth devices.
-   - Extend `pnpm verify` with render and range assertions.
-
-2. **B3 — Disk I/O history sparkline**
-   - First add verification that the disk panel still renders cleanly with disk
-     throughput history present.
-   - Add disk read/write history rings to `useMetrics`.
-   - Render a compact sparkline without changing the wide-screen layout contract.
-
-3. **B4 — CPU per-core mini-grid**
-   - Treat as visual polish unless a stronger invariant emerges.
-   - Preserve P/E distinction and wide-screen layout.
-   - Record an `--once` snapshot note in the worklog for owner eyeballing.
+As of the 2026-06-20 redesign the order is staged **`RD0 → RD0b → RD0c → RD1 → RD2 → RD3 → RD4
+→ RD5`** — **safety-net first**: harden `verify.mjs` (RD0–RD0c) before any visual rewrite.
+**B2 (Bluetooth), B3 (disk sparkline), B6 (clock) are DEFERRED, and B4 (per-core) is folded into
+RD2+RD4**, until after the redesign. Do NOT start Bluetooth or any feature module against the old
+visual contract — that is exactly the stale-contract trap this plan exists to prevent.
 
 ## Decisions still worth tightening
 

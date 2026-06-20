@@ -27,9 +27,13 @@ from unprivileged commands (`sysctl`, `vm_stat`, `ioreg`, `pmset`, `netstat`, `d
 `ps`) + Node `os`. Anything needing `sudo` (powermetrics: precise per-cluster freq,
 GPU/ANE watts, fan RPM, die temps) is shown as `—`, never blocks, never prompts.
 
-- **Do:** keep the default path sudo-free; if powermetrics ever lands, it's an
-  explicit opt-in "enhanced mode," off by default.
-- **Don't:** make the default experience depend on elevated privileges.
+- **Do:** keep the path sudo-free, **period.** There is **no** sudo mode — not even an
+  opt-in `--enhanced` one. Never requesting a password is part of machud's identity
+  (owner ruling 2026-06-20). Metrics that would need `sudo`/powermetrics (precise
+  per-cluster freq, GPU/ANE watts, fan RPM, die temps, total system power) stay `—`.
+- **Don't:** make the experience depend on elevated privileges, or add any code path —
+  default or flagged — that shells `sudo`. A privileged helper is exactly the kind of
+  fragile, security-sensitive surface this project refuses (see CONTRIBUTING.md / D1).
 
 ## D3. Never crash, just degrade
 
@@ -39,13 +43,26 @@ collector for its empty default.
 
 - **Don't:** introduce a code path where one bad reading blanks or crashes the app.
 
-## D4. Wide-screen only — for now (responsive deferred, by choice)
+## D4. Responsive — wide curated default + one narrow fallback (REOPENED 2026-06-20 by @hyf0)
 
-Responsive reflow was explicitly cut from this version to keep it simple. The
-layout targets wide terminals. This is a deliberate deferral, not an oversight.
+Supersedes the old "wide-screen only, responsive deferred." @hyf0 reopened this (exactly the
+"reopen only with @hyf0" path the old decision reserved). machud now adapts to the terminal
+**viewport size**, the same way D8 adapts to system appearance — **automatically, no config, no
+switch.** Still zero-config, still one curated experience; it just fits the window. So it stays
+compatible with D1.
 
-- **Don't:** silently start adding breakpoint logic. If responsive comes back,
-  it's its own scoped decision with @hyf0.
+- **Scope = TWO tiers, not five.** A wide curated default (the 3-tier hierarchy in DESIGN.md) +
+  ONE narrow/watch-face single-column fallback, with a single tested breakpoint. The full
+  5-breakpoint × per-panel-S/M/L ladder is rejected as a scope bomb for the hands-off loop.
+- **Build it LAST**, after the visual redesign (RD5), and gate it on the verify width assertions.
+- **Mind the width seam:** `useWindowSize()` is reactive — it reads `stdout.columns` and only
+  falls back to 80 when piped/non-TTY; `App.vue` already binds it as the width. The real issue is
+  that the `--once`/verify path has no TTY width, so the gate drives width via `COLUMNS` →
+  `renderToString({columns})` (which `main.ts` already does). RD5 must make any responsive `v-if`
+  read the **same** width the gate controls (thread `columns` as a prop), so a breakpoint asserted
+  at `COLUMNS=120`/`40` is the width the code actually branches on.
+- **Don't:** let the loop self-grant responsive (it was a standing-anchor conflict — this reopen
+  is the owner ruling that unblocks it). Don't add breakpoints the gate can't render-test.
 
 ## D5. Scope — 9-module Stats parity as the goal, phased delivery
 
@@ -93,3 +110,61 @@ This is compatible with D1 because it is **not** a user-facing theme setting:
 there is no config file, no CLI flag, and no in-app switch. The app simply adapts
 to the system preference. Verification may use an internal test override to
 exercise both palettes, but that is not product surface.
+
+Dark is the **hero** look (the cool/gradient identity glows on dark). Light is a **faithful,
+lower-drama daylight mode** — gradients compress and it cannot glow, which is acceptable by
+physics — but it carries the same quality bar minus glow (hero, alignment, status glyphs must
+read as deliberate on the cream base). Dark-only was considered and **rejected** (it would put a
+glaring black rectangle on a bright Mac desktop — worse eye strain than flat light, and would
+reopen a one-day-old ruling for a pure preference).
+
+## D9. The visual identity is Everforest, recorded in DESIGN.md  [VOUCHED @hyf0]
+
+Owner ruling 2026-06-20. machud's look is "**cool but refined**" — striking through FORM
+(truecolor gradient meters, 2×4 braille graphs, big block numbers) yet muted and low-strain
+through COLOR. The palette is **Everforest** (green-forward, using Everforest's own green
+`#a7c080`), chosen for proven low eye-strain; identity comes from composition + the zero-sudo
+data story, not the palette.
+
+The full spec lives in [`/DESIGN.md`](../../DESIGN.md) and is the **hands-off aesthetic anchor**
+the loop optimizes against — a [VOUCHED]-level surface. Most of it is currently **TARGET** (the
+code is still Tokyo Night + the old grid); the staged RD0–RD5 backlog builds toward it.
+
+- **Do:** make `src/theme.ts` the runtime mirror of the DESIGN.md tokens, pinned in verify.mjs.
+- **Don't:** drift the look, or treat unbuilt DESIGN.md prose as a passing invariant.
+
+## D10. Opinionated contribution model
+
+Owner ruling 2026-06-20, recorded in [`/CONTRIBUTING.md`](../../CONTRIBUTING.md). Because machud
+is opinionated (D1), the contribution surface is intentionally narrow: **bug/compat reports
+welcome; ideas as discussion-first issues; feature PRs opened without a prior agreed issue are
+closed directly; theming / feature / aesthetic changes are generally not accepted.**
+
+## D11. Truecolor is an enhancement, not a guarantee — color-tier fallback
+
+The gradient identity assumes 24-bit color, but macOS's **default Terminal.app is 256-color**.
+Without a fallback, same-hue ramps flatten to bands and muted hexes snap to saturated basic ANSI
+(the neon the design forbids). machud must detect the terminal color level and degrade: truecolor
+→ full gradients; 256 → a single **solid accent** (like light mode); 16 → muted **named** ANSI.
+Judge the look through the real render path at level 2/1, not raw truecolor.
+
+## D12. Network shows no IP address — recorded waiver
+
+Owner ruling 2026-06-20. The NETWORK panel **drops the LAN IP** (previously shown) and shows
+interface name + rates instead. Rationale: a LAN IP is low glance-value *and* machud is built to
+be screenshotted/shared, so any network identifier is needless exposure. This is an **explicit,
+logged waiver** of DoD rule 3 (a previously-live metric going absent), not a silent regression.
+
+## D13. Distribution is `npx machud` — zero-install, the primary way people run it  [VOUCHED @hyf0]
+
+Owner ruling 2026-06-20. The common usage is **`npx machud`** — run-on-the-fly, no install. That
+makes the first five seconds the whole product and **hard-reinforces** the rest: zero-config (D1);
+**never prompt for a password** (D2 — a `npx` tool asking for root is a trust-killer); and the
+**truecolor color-tier fallback** (D11) is mandatory, because npx users are on whatever terminal
+they have, including macOS's default Terminal.app (256-color).
+
+- **Do:** keep the published package **runnable via `npx machud`** — un-`private`, a shebang on the
+  bin, declared `files`/`engines`, and a **lean runtime dep tree** for fast cold start. A verify
+  assertion must confirm the built bin actually launches (don't ship a package that can't run).
+- **Don't:** add a required install/build step, a heavy runtime dependency, or anything that makes
+  the first `npx machud` slow, broken, or privilege-prompting.
