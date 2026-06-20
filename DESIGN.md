@@ -77,7 +77,6 @@ glyphs:
   spark:     "▁▂▃▄▅▆▇█"
   sep:       "·"
   charge:    "⇡ charging · ⇣ discharging"   # width-1, NOT the ⚡ emoji (double-width)
-  state:     "○ normal · ◐ elevated · ● high/alert"   # non-hue status channel (color-blind safe)
   absent:    "—"                            # honest placeholder for sudo-only / unavailable
 
 # --- SPACE & WEIGHT ---
@@ -97,7 +96,7 @@ components:
   Meter:     { fill: "module accent → warn/bad as value enters danger (levelColor)", track: dim }
   Sparkline: { ramp: "module accent luminance" }
   Graph:     { type: braille_area, ramp: "same-hue luminance, dim bottom → accent top" }
-  Status:    { color: "good/warn/bad", glyph: "○/◐/● — REQUIRED, status never rides hue alone" }
+  Status:    { color: "good/warn/bad", escalation: "intensity + bar bleeds to warn/bad + a text label where it helps" }
 ---
 
 # machud — Visual Identity
@@ -130,14 +129,14 @@ The seven principles are the whole spec in miniature.
    BIG, top-left, in a preattentive channel (size + position + accent). *(Few, "5-second rule";
    Ware, preattentive processing.)*
 2. **Color = identity + state, on DIFFERENT channels.** Hue marks *which module*. **Status is
-   carried by a non-hue, width-1 STATE GLYPH (`○` normal / `◐` elevated / `● ` high) + intensity
-   + a text token — never by hue alone**, so it survives a mono terminal and red-green
-   color-blindness (the green-forward palette makes green-vs-red the worst confusion pair, so
-   redundant encoding is mandatory, not optional). *(Ware; WCAG redundant encoding.)*
+   carried by colour + intensity** (good/warn/bad green/amber/red; a bar bleeding toward warn-red),
+   plus a text label where it helps (e.g. disk "FULL"). **No accessibility / colour-independence
+   layer** — machud is a passive full-screen TUI (not screen-reader territory), and the owner ruled
+   a11y out of scope (D14). *(Few; Ware, preattentive attributes.)*
 3. **Cool by default, dramatic on alarm.** Baseline is already handsome (Everforest muted +
    gradient meters + braille graphs + easing on value change). Healthy = quiet. Only an
    **event** (near-full, thermal, on-battery) earns escalation: brightness, the bar bleeding to
-   warn/bad, the state glyph, and — only here — motion. **Motion is alarm/transition-only, never
+   warn/bad, and — only here — motion. **Motion is alarm/transition-only, never
    a routine-state carrier** (and it is invisible to a single-frame gate, so it is not a
    load-bearing accessibility channel). *(Weiser, Calm Technology; Tufte, "smallest effective difference".)*
 4. **Space by value.** Real estate ∝ worth, not democratic. **CPU and Memory get the most room
@@ -175,7 +174,7 @@ Rules (*Refactoring UI*, Few, Tufte's *smallest effective difference*):
   not the raw-truecolor prototype.
 - **Light/dark follows macOS** automatically (D8); no theme switch (D1). Light is a **faithful,
   lower-drama daylight mode**: gradients compress, it cannot glow, and that is acceptable by
-  physics — but hero, alignment, and status glyphs must read as **deliberate** on the cream base.
+  physics — but hero, alignment, and status colours must read as **deliberate** on the cream base.
   Light is not a downgrade; it has the same quality bar minus glow.
 
 ## Glyphs & weight (the terminal's typography)
@@ -186,7 +185,7 @@ A fixed-width grid has no fonts, so the **character set and ANSI weight are the 
   secondary values are normal weight and `dim`.
 - **Gradients are same-hue luminance ramps** — gentle, never a hue clash.
 - **`⇡ / ⇣`** for charge direction (width-1; **never `⚡`**, a double-width emoji that breaks
-  alignment and tofus on glyph-poor terminals). **`○ ◐ ●`** carry status. **`—`** = unavailable.
+  alignment and tofus on glyph-poor terminals). **`—`** = unavailable.
 
 ## Layout (TARGET — not yet shipped; current code is the old flat 3-row grid)
 
@@ -255,15 +254,13 @@ hierarchy** — important up top, minor compressed below:
 - **DISK — tier-3 strip.** Used % + free, compact. A **state signifier** that is *earned*:
   neutral when roomy; `levelColor`-driven bar + a `NEAR FULL`/`FULL` text token at ≥85% / ≥95%.
   (Today DiskPanel hardcodes the disk hue and wires no levelColor — RD3 fix.)
-- **SENSORS — tier-3 strip.** `pmset` thermal pressure + battery pack temp. The collector's 4-state
-  enum maps to the status glyph: **Nominal→`○`, Fair→`◐`, Serious/Critical→`●`** (keep the verify.mjs
-  4-value enum intact). Die temps / fan RPM need `sudo` → `—`.
+- **SENSORS — tier-3 strip.** `pmset` thermal pressure (coloured good/warn/bad by severity) +
+  battery pack temp. Die temps / fan RPM need `sudo` → `—`.
 
 ## Do's & Don'ts
 
 **Do**
 - Make one number the obvious hero of each panel.
-- Carry status on the `○/◐/●` glyph + text, in addition to color (color-blind safe), in BOTH palettes.
 - Align every bar in a panel to a shared label column + bar width (clean vertical rules).
 - Use gradient meters / braille graphs that *encode data*; degrade gradients to a solid accent
   below truecolor.
@@ -273,8 +270,7 @@ hierarchy** — important up top, minor compressed below:
 
 **Don't**
 - Don't fix "flat" with saturation or contrast — add form/data/hierarchy instead.
-- Don't let status ride hue alone, or use the `⚡` emoji, or pure black/white, or complementary
-  hue clashes.
+- Don't use the `⚡` emoji, pure black/white, or complementary hue clashes.
 - Don't spend per-module hue on panel bodies — confine it to title/border/hero number.
 - Don't treat motion as a routine-state channel (alarm/transition only).
 - Don't ask for `sudo`, ever — not even opt-in (D2). Don't give Disk/Sensors hero space.

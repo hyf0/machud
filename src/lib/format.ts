@@ -28,12 +28,3 @@ export function temp(c: number | null): string {
 export function padEnd(s: string, w: number): string {
   return s.length >= w ? s.slice(0, w) : s + " ".repeat(w - s.length);
 }
-
-// Non-hue status channel: ○ calm · ◐ elevated · ● alert. Pairs with colour so status
-// survives a mono terminal / colour-blindness (DESIGN.md Principle 2). Covers memory
-// pressure (Normal/Elevated/High) and thermal pressure (Nominal/Fair/Serious/Critical).
-export function statusGlyph(level: string): string {
-  if (/high|serious|critical/i.test(level)) return "●";
-  if (/elevated|fair|warn/i.test(level)) return "◐";
-  return "○";
-}

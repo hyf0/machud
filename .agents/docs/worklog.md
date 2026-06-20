@@ -5,6 +5,16 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **Dropped accessibility — owner ruling, VOUCHED (branch `redesign`).** Owner ruled a11y out of
+  scope (D14): for a passive full-screen TUI the only realistic a11y is colour-independence, and even
+  that isn't wanted. Reverted the `○◐●` status glyphs (RD3 pt1) — status is colour-only again
+  (MemoryPanel, SensorsPanel, format.ts). **GATE WEAKENED:** removed the verify "● on High pressure"
+  assertion and lowered `MIN_CHECKS` 58→57 — a *sanctioned* removal per the owner ruling (autonomy
+  gate-rule 2). Scrubbed a11y from DESIGN.md (Principle 2, glyph token, Sensors mapping, Do's/Don'ts)
+  and added **D14 [VOUCHED]**. The braille area *graph* (RD4) is KEPT — it's a drawing technique, not
+  a11y (owner confirmed after we untangled the term). The `⇡/⇣` charge glyph + `—` stay (real info,
+  not a11y). `pnpm verify` PASS (57).
+
 - **RD3 (part 3) — gradient meters + D11 colour-tier fallback (branch `redesign`).** New
   `src/lib/color.ts` (hex mix / same-hue `ramp` / `supportsTruecolor`). Bar.vue now renders each
   filled cell as a **same-hue dim→accent gradient** on truecolor terminals, and degrades to the

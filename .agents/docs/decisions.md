@@ -168,3 +168,18 @@ they have, including macOS's default Terminal.app (256-color).
   assertion must confirm the built bin actually launches (don't ship a package that can't run).
 - **Don't:** add a required install/build step, a heavy runtime dependency, or anything that makes
   the first `npx machud` slow, broken, or privilege-prompting.
+
+## D14. No accessibility layer — out of scope  [VOUCHED @hyf0]
+
+Owner ruling 2026-06-20. machud does **not** pursue accessibility. For a passive, full-screen TUI
+that takes over the terminal (D7), the realistic a11y surface is only **colour-independence**
+(screen-reader and keyboard a11y don't apply to a non-interactive alt-screen app), and the owner
+decided even that isn't worth it. So **status is conveyed by colour** (good/warn/bad) — no mandatory
+non-hue glyph, no colour-blind redundant-encoding requirement.
+
+- **Do:** use colour freely for status; a text label (e.g. disk "FULL") is fine where it reads well,
+  but it's a UX choice, not an a11y obligation.
+- **Don't:** add `○/◐/●`-style status glyphs, screen-reader hints, or other a11y scaffolding "to be
+  safe." This is a deliberate, settled non-goal — reopen only with @hyf0.
+- Note: `⇡/⇣` (charge direction) and `—` (unavailable) stay — they carry real information and replace
+  a double-width emoji; they are not a11y features.
