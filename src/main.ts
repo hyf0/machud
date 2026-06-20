@@ -28,7 +28,7 @@ if (args.includes("--json")) {
   const columns = Number(process.env.COLUMNS) || process.stdout.columns || 120;
   const Snapshot = defineComponent({
     name: "MachudSnapshot",
-    setup: () => () => h(App, { snapshot }),
+    setup: () => () => h(App, { snapshot, columns }),
   });
   process.stdout.write(renderToString(Snapshot, { columns }) + "\n");
   process.exit(0);

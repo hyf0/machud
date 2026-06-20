@@ -3,7 +3,24 @@
 Async review trail. One dated bullet per milestone: what changed, verify status,
 anything to eyeball. Newest first.
 
-## 2026-06-20
+## 2026-06-21
+
+- **RD5 — responsive (2-tier) → REDESIGN COMPLETE (branch `redesign`).** Threaded the width seam (the
+  long-standing D4 catch): `main.ts` passes the `COLUMNS`-derived width as a `columns` prop to `App`,
+  and `App`'s responsive `width` prefers it (`props.columns || useWindowSize().columns || 120`) — so
+  the `v-if` branches on the SAME width the gate drives, not a TTY-only source. Wide (≥100) = the full
+  3-tier; narrow (<100) = `NarrowView`, a single compact column (one line per module, no hero
+  BigNumber/graphs — the hierarchy IS the degradation). `HeaderBar` drops its tagline+summary when
+  narrow (keeps mac|hud + clock); footer compacts to `q quit`. Caught + fixed a layout bug: the `Bar`
+  fragment's two Texts became separate flex children under `space-between` (gap between fill/track) —
+  wrapped each narrow Bar in a `<Box>`. verify: hero present@120 / absent@40 + no-overflow@40 (seam
+  proven). `MIN_CHECKS` 67→69, `pnpm verify` PASS (69). **Eyeball:** `COLUMNS=40 node dist/machud.mjs
+  --once` (watch-face) and a normal-width terminal (3-tier).
+  **🏁 RD0→RD5 redesign COMPLETE** — gate hardened (RD0–RD0d), Everforest palette (RD1), data-honest
+  collectors (RD2), gradient/glyph components (RD3), hero density + 3-tier + stability + hue (RD4),
+  responsive (RD5). 12 commits on `redesign`, not pushed (awaiting owner). Remaining: **B2/B3/B6**
+  (deferred features — need owner direction on placement/whether-to-add), **Q2** (dark `dim` hex —
+  VOUCHED-blocked), and **push**.
 
 - **RD4 (part 9) — hue confinement (branch `redesign`).** Realized D9's vouched rule "green is the only
   hue across panels": moved the meter BAR bodies off the per-module hue — MEM used bar → `levelColor`

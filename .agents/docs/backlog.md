@@ -110,7 +110,13 @@ _(pick RD0 — top of Redesign.)_
   PASS (58). **Moved to RD4** (layout-coupled — they need the tall hero panels): `BigNumber` (5-row
   block hero number) and the braille area `Graph` (the flowing history chart needs panel height).
 
-- **RD4 — 3-tier layout + hero visuals + DENSITY/STABILITY (wide only)** · `TODO`
+- **RD4 — 3-tier layout + hero visuals + DENSITY/STABILITY (wide only)** · `DONE`
+  Done (pt1–pt9): braille `Graph` + `BigNumber` hero + per-core load `CoreGrid` + CPU/MEM top-process
+  lists + MEM hero + **3-tier layout** (Net-lead tier-2 / Disk+Sensors tier-3) + battery power-row
+  **stability** + GPU history graph + **hue confinement** (green-forward bodies; module hue only on
+  title/border/hero). Owner feedback addressed inline (CPU "big box, little content" density; mac|hud
+  wordmark VOUCHED → D15). `pnpm verify` PASS (67). Minor follow-ups logged: fixed-height proc lists,
+  Disk R/W text hue, tier-3 one-line compaction.
   3-tier: tier-1 hero CPU + Memory; tier-2 Network (lead) + GPU + Battery; tier-3 status strip
   (Disk/Sensors/uptime/load). Build the `BigNumber` (5-row hero number) + the tall **braille area
   Graph** components here. **Owner feedback 2026-06-20 — make it interesting, not boring:**
@@ -127,7 +133,13 @@ _(pick RD0 — top of Redesign.)_
     + green (greenforward).
   Must pass RD0b alignment + no-overflow at COLUMNS=120; verify green; snapshot in worklog.
 
-- **RD5 — Responsive (2-tier), LAST** · `TODO (D4 reopened)`
+- **RD5 — Responsive (2-tier), LAST** · `DONE`
+  Done: width seam threaded — `COLUMNS` → `renderToString({columns})` → `App` `columns` prop → the
+  responsive `width` (no longer a TTY-only source), so the gate controls the breakpoint. Wide 3-tier
+  at width ≥ 100; narrow single-column watch-face below it (`NarrowView` — one compact line per module,
+  no hero BigNumber/graphs); `HeaderBar` + footer compact when narrow. verify asserts hero present@120
+  / absent@40 + no-overflow@40 (the seam is proven). `MIN_CHECKS` 67→69, `pnpm verify` PASS. Single
+  breakpoint (D4), not a 5-breakpoint ladder.
   Thread the gate-controlled width (`COLUMNS` → `renderToString({columns})`, already in main.ts) as
   a prop so the responsive `v-if` branches on the SAME width verify drives (not a TTY-only source —
   `useWindowSize` is reactive but the verify path has no TTY width). Then a wide-default + one

@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 67;
+const MIN_CHECKS = 69;
 
 let failures = 0;
 let total = 0;
@@ -148,6 +148,17 @@ check(!/NaN|undefined/.test(frame), "frame has no NaN/undefined");
 const stripAnsi = (s) => s.replace(/\x1b\[[0-9;]*m/g, "");
 const widest = Math.max(0, ...frame.split("\n").map((l) => [...stripAnsi(l)].length));
 check(widest <= 120, `no overflow at wide target (widest line ${widest} ≤ 120)`);
+// Responsive seam (RD5/D4): the layout branches on the gate-controlled width (COLUMNS →
+// renderToString → columns prop), not a TTY-only source. At a watch-face width the hero is ABSENT
+// (no BigNumber/graphs — they need room) and nothing overflows; at 120 the hero IS present (the
+// BigNumber injection test in §8). Together they prove the breakpoint the code branches on.
+const f40 = await run("node", [bundle, "--once"], { env: { ...process.env, COLUMNS: "40" } });
+const widest40 = Math.max(0, ...f40.split("\n").map((l) => [...stripAnsi(l)].length));
+check(widest40 <= 40, `no overflow at narrow width (widest line ${widest40} ≤ 40)`);
+const f40hero = await run("node", [bundle, "--once"], {
+  env: { ...process.env, COLUMNS: "40", MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { usage: 88 } }) },
+});
+check(!f40hero.includes("█ █ █ █"), "narrow layout drops the BigNumber hero (responsive seam works)");
 check(!frame.includes("⚡"), "no ⚡ emoji in the frame (charge state uses ⇡/⇣)");
 check(/[⠁-⣿]/.test(frame), "braille area history graph renders (filled braille)");
 
