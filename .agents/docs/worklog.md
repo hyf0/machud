@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD2 — data-honesty collectors (branch `redesign`).** Made the headline metrics true, each TDD
+  (red provenance assertion → implement → green) with a collector-level test hook: **memory** reads
+  the real `kern.memorystatus_vm_pressure_level` (1/2/4→Normal/Elevated/High), heuristic only as a
+  fallback (`MACHUD_TEST_PRESSURE_LEVEL`); **battery** adds `adapterWatts` (AdapterDetails.Watts) +
+  `chargeWatts` = V·A/1e6 with a signed-64 reinterpret of ioreg's UNSIGNED Amperage
+  (`MACHUD_TEST_AMPERAGE`; live-verified -6.16 W on battery); **cpu** models one cluster on Intel
+  instead of `0P+0E` (`MACHUD_TEST_NO_PERFLEVEL`); **network** drops the LAN IP (D12 — type/empty/
+  collector/panel; interface name stays in the header). `pnpm verify` PASS (51 assertions).
+
 - **RD0c — synthetic-input injection mechanism (branch `redesign`).** `collectAll()` now applies
   `MACHUD_TEST_OVERRIDE` — a JSON env deep-merged into the snapshot (sibling of
   `MACHUD_TEST_APPEARANCE`; product path untouched when unset) — so the gate can exercise states this

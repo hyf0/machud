@@ -12,10 +12,16 @@ let model = "";
 
 async function clusterCounts(): Promise<{ p: number; e: number }> {
   if (counts) return counts;
-  const out = await sh("sysctl", ["-n", "hw.perflevel0.logicalcpu", "hw.perflevel1.logicalcpu"]);
+  // MACHUD_TEST_NO_PERFLEVEL forces the Intel/single-cluster path (test-only; see verify.mjs).
+  const out = process.env.MACHUD_TEST_NO_PERFLEVEL
+    ? ""
+    : await sh("sysctl", ["-n", "hw.perflevel0.logicalcpu", "hw.perflevel1.logicalcpu"]);
   const nums = out.trim().split(/\s+/).map(Number);
   // perflevel0 = performance cores, perflevel1 = efficiency cores.
-  counts = { p: nums[0] || 0, e: nums[1] || 0 };
+  const p = nums[0] || 0;
+  const e = nums[1] || 0;
+  // Intel / single-cluster Macs have no perflevel split → model as ONE P cluster, never 0P+0E.
+  counts = p + e === 0 ? { p: os.cpus().length, e: 0 } : { p, e };
   return counts;
 }
 

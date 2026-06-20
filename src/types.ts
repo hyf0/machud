@@ -56,7 +56,6 @@ export interface DiskMetric {
 
 export interface NetMetric {
   iface: string;
-  ip: string | null;
   rxBps: number;
   txBps: number;
   rxTotal: number;

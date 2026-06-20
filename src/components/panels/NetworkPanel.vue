@@ -24,9 +24,5 @@ defineProps<{ net: NetMetric; rx: number[]; tx: number[] }>();
       <Text :color="theme.gpu" bold>▲ {{ humanBytes(net.txBps, true) }}</Text>
     </Box>
     <Sparkline :values="tx" :color="theme.gpu" />
-
-    <Box>
-      <Text :color="theme.dim">{{ net.ip ?? "no address" }}</Text>
-    </Box>
   </Panel>
 </template>

@@ -74,7 +74,12 @@ _(pick RD0 — top of Redesign.)_
   desync. D4 is already reopened in decisions. Acceptance: theme matches DESIGN.md tokens; pin
   assertions added; `pnpm verify` green; `--once` shows the Everforest palette (eyeball in worklog).
 
-- **RD2 — Data-honesty collectors** · `TODO`
+- **RD2 — Data-honesty collectors** · `DONE`
+  Done: memory.ts reads the real `kern.memorystatus_vm_pressure_level`; battery.ts adds
+  `adapterWatts` + `chargeWatts` with signed-64 Amperage reinterpret; cpu.ts models a single cluster
+  on Intel (no `0P+0E`); network.ts drops the LAN IP (D12). Each has a collector-level test hook
+  (`MACHUD_TEST_PRESSURE_LEVEL` / `MACHUD_TEST_AMPERAGE` / `MACHUD_TEST_NO_PERFLEVEL`) + a verify
+  provenance assertion. `pnpm verify` PASS (51).
   Make the headline metrics true (D6, using RD0c's injection mechanism): real `sysctl
   kern.memorystatus_vm_pressure_level` (1→Normal/2→Elevated/4→High) in `memory.ts`;
   `adapterWatts`/`chargeWatts` in `battery.ts` + `BatteryMetric` fields — `watts = V(mV)·A(mA)/1e6`,

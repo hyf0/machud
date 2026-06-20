@@ -30,7 +30,7 @@ export function emptyMetrics(): Metrics {
     },
     gpu: { usage: null, renderer: null, vram: null },
     disk: { total: 0, used: 0, free: 0, usedPct: 0, readBps: 0, writeBps: 0, mount: "/" },
-    net: { iface: "—", ip: null, rxBps: 0, txBps: 0, rxTotal: 0, txTotal: 0 },
+    net: { iface: "—", rxBps: 0, txBps: 0, rxTotal: 0, txTotal: 0 },
     battery: {
       present: false,
       pct: 0,

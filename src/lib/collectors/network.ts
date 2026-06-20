@@ -1,4 +1,3 @@
-import os from "node:os";
 import { sh } from "../exec";
 import type { NetMetric } from "../../types";
 
@@ -34,6 +33,7 @@ export async function collectNet(): Promise<NetMetric> {
   }
   prev = { rx, tx, t: now };
 
-  const ip = os.networkInterfaces()[iface]?.find((a) => a.family === "IPv4")?.address ?? null;
-  return { iface, ip, rxBps, txBps, rxTotal: rx, txTotal: tx };
+  // No IP address (D12): low glance-value and a needless leak in screenshots machud is built
+  // to be. The interface name + rates are the valuable part.
+  return { iface, rxBps, txBps, rxTotal: rx, txTotal: tx };
 }

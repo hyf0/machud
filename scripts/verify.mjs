@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 49;
+const MIN_CHECKS = 51;
 
 let failures = 0;
 let total = 0;
@@ -99,6 +99,7 @@ if (m) {
   check(inRangeOrNull(m.gpu.usage, 0, 100), "gpu usage null or 0–100");
   check(m.disk.total > 0 && inRange(m.disk.usedPct, 0, 100), "disk total>0 and usedPct in range");
   check(m.net.rxBps >= 0 && m.net.txBps >= 0, "net rates non-negative");
+  check(!("ip" in m.net), "net carries no ip field (D12 privacy/screenshot waiver)");
 
   // Battery / Sensors
   check(inRange(m.battery.pct, 0, 100), "battery pct in 0–100");
@@ -278,6 +279,21 @@ console.log("\ntest injection (RD0c)");
   check(
     typeof j?.battery?.chargeWatts === "number" && j.battery.chargeWatts < 0,
     "battery chargeWatts handles unsigned-Amperage wraparound (→ negative on discharge)",
+  );
+}
+{
+  // Provenance (RD2): on a single-cluster / Intel Mac (no perflevel sysctls) cpu must model
+  // ONE cluster, never 0P+0E. Force the no-perflevel path; require pCount==cores, eCount==0.
+  const env = { ...process.env, MACHUD_TEST_NO_PERFLEVEL: "1" };
+  let j = null;
+  try {
+    j = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(
+    j?.cpu?.eCount === 0 && j?.cpu?.pCount === j?.cpu?.cores?.length && j.cpu.pCount > 0,
+    "cpu models a single cluster when no P/E split (Intel — never 0P+0E)",
   );
 }
 
