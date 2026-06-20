@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 55;
+const MIN_CHECKS = 56;
 
 let failures = 0;
 let total = 0;
@@ -312,6 +312,12 @@ for (const [lvl, want] of [
   const env = { ...process.env, MACHUD_TEST_PRESSURE_LEVEL: "4", COLUMNS: "120" };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("●"), "status carries a non-hue glyph (● on High memory pressure)");
+}
+{
+  // Disk near-full (RD3): inject 96% used → the EARNED "FULL" signal must render (text channel).
+  const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ disk: { usedPct: 96 } }), COLUMNS: "120" };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("FULL"), "disk shows the earned near-full signal (96% → FULL)");
 }
 
 // ── 9. Gate strength (strengthen-only floor) ────────────────────────────────

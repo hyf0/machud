@@ -5,6 +5,12 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD3 (part 2) — disk earned near-full signal (branch `redesign`).** DiskPanel was hardcoded to
+  the disk hue with no escalation. Now it stays calm (module hue) until near-full, then an EARNED
+  signal escalates on both colour AND text: amber `NEAR FULL` ≥85%, red `FULL` ≥95% (the bar colour
+  + the right-hand label both flip). verify injects 96% (RD0c hook) and asserts `FULL` renders.
+  `pnpm verify` PASS (56). Remaining RD3: gradient Meter, braille Graph, D11 fallback.
+
 - **RD3 (part 1) — status glyphs + ⚡→⇡ (branch `redesign`).** Added a `statusGlyph()` helper
   (`○` calm / `◐` elevated / `● ` alert) and wired it into MemoryPanel (pressure) and SensorsPanel
   (thermal), so status now rides a **non-hue channel** (color-blind safe, DESIGN.md Principle 2) —

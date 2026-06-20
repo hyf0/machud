@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
@@ -6,7 +7,16 @@ import { theme } from "../../theme";
 import { pct, humanBytes } from "../../lib/format";
 import type { DiskMetric } from "../../types";
 
-defineProps<{ disk: DiskMetric }>();
+const props = defineProps<{ disk: DiskMetric }>();
+
+// Disk is low-value real estate, so it stays calm (its module hue) until near-full, when an
+// EARNED signal escalates: amber ≥85% "NEAR FULL", red ≥95% "FULL" (colour + text, non-hue safe).
+const diskColor = computed(() =>
+  props.disk.usedPct >= 95 ? theme.bad : props.disk.usedPct >= 85 ? theme.warn : theme.disk,
+);
+const diskState = computed(() =>
+  props.disk.usedPct >= 95 ? "FULL" : props.disk.usedPct >= 85 ? "NEAR FULL" : "",
+);
 </script>
 
 <template>
@@ -17,11 +27,13 @@ defineProps<{ disk: DiskMetric }>();
 
     <Box justifyContent="space-between">
       <Text :color="theme.disk" bold>{{ pct(disk.usedPct) }}</Text>
-      <Text :color="theme.dim">{{ humanBytes(disk.free) }} free</Text>
+      <Text :color="diskState ? diskColor : theme.dim">{{
+        diskState || `${humanBytes(disk.free)} free`
+      }}</Text>
     </Box>
 
     <Box>
-      <Bar :value="disk.usedPct" :width="16" :color="theme.disk" />
+      <Bar :value="disk.usedPct" :width="16" :color="diskColor" />
     </Box>
 
     <Box>
