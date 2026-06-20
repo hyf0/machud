@@ -14,7 +14,8 @@ asynchronously, not in the loop.
 **Stop and ask ONLY when:**
 - a change would cross a `[VOUCHED @hyf0]` decision in decisions.md (currently
   **D1** not-configurable, **D7** terminal takeover, **D9** Everforest visual identity,
-  **D13** `npx machud` zero-install distribution, **D14** no accessibility layer) — these are settled;
+  **D13** `npx machud` zero-install distribution, **D14** no accessibility layer, **D15** the two-tone
+  `mac|hud` wordmark) — these are settled;
 - an action is **outward-facing or irreversible**: `git push`, publishing,
   deleting the user's data, anything that leaves this machine/repo;
 - the work genuinely can't proceed without a human ruling (a real fork in intent,

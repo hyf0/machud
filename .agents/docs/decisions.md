@@ -183,3 +183,15 @@ non-hue glyph, no colour-blind redundant-encoding requirement.
   safe." This is a deliberate, settled non-goal — reopen only with @hyf0.
 - Note: `⇡/⇣` (charge direction) and `—` (unavailable) stay — they carry real information and replace
   a double-width emoji; they are not a11y features.
+
+## D15. The machud wordmark is two-tone `mac|hud` — mac silver, hud green  [VOUCHED @hyf0]
+
+Owner ruling 2026-06-20. The top-left logo splits the word: **`mac`** in Apple aluminium/silver
+(the `silver` token — `#c4c9cf` dark / `#8d939a` light) and **`hud`** in the brand green (the
+`accent`/`cpu` token — `#a7c080` dark / `#8da101` light), surfacing the "a HUD for the Mac" reading.
+
+- **Settled:** the split (`mac`|`hud`), the **silver `mac`**, and the **green `hud`**. Reopen only
+  with @hyf0. Mirrored in `HeaderBar.vue` (`theme.silver` + `theme.accent`, both bold) and the
+  DESIGN.md `silver` token; an owner-directed extension of the D9 palette.
+- **Don't:** flatten the wordmark to one colour, swap which half is silver vs green, or drop the
+  `silver` token.
