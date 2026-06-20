@@ -40,9 +40,9 @@ const diskState = computed(() =>
 
     <Box>
       <Text :color="theme.dim">R </Text>
-      <Text :color="theme.net">{{ humanBytes(disk.readBps, true) }}</Text>
+      <Text :color="theme.text">{{ humanBytes(disk.readBps, true) }}</Text>
       <Text :color="theme.dim">  W </Text>
-      <Text :color="theme.warn">{{ humanBytes(disk.writeBps, true) }}</Text>
+      <Text :color="theme.text">{{ humanBytes(disk.writeBps, true) }}</Text>
     </Box>
     <Box>
       <Text :color="theme.dim">{{ humanBytes(disk.used) }} / {{ humanBytes(disk.total) }}</Text>

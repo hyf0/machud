@@ -89,9 +89,11 @@ a cold npm cache), so it runs last.
 Shipped: CPU (P/E), Memory, GPU, Disk, Network, Battery, Sensors, Clock (header),
 system-following light/dark appearance, `pnpm verify` gate, alternate-screen takeover.
 
-**In progress — the visual redesign** (see [`/DESIGN.md`](../../DESIGN.md), the aesthetic anchor;
-D9). It moves machud to a "cool but refined" Everforest identity with a 3-tier layout, and is
-staged RD0–RD5 (safety-net-first) in [backlog.md](./backlog.md). New collectors it adds:
+**Shipped — the visual redesign (RD0–RD5, 2026-06-21).** machud now has the "cool but refined"
+Everforest identity: a 3-tier layout (CPU/MEM heroes · Net-lead/GPU/Battery · Disk/Sensors), hero
+density (BigNumber + braille history graphs + per-core load grid + top-process lists), green-forward
+hue confinement, battery-row stability, and a responsive wide↔watch-face seam. It was staged RD0–RD5
+(safety-net-first) in [backlog.md](./backlog.md). Collectors it added:
 **memory pressure** (`sysctl kern.memorystatus_vm_pressure_level`), **battery adapter + charge
 watts** (`AdapterDetails.Watts`; `Voltage·Amperage/1e6`). New rendering concerns: a **truecolor
 color-tier fallback** (D11 — Terminal.app is 256-color) and an **Apple-Silicon/Intel P/E branch**.

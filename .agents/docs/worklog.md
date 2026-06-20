@@ -5,6 +5,17 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Redesign polish + records sync; autonomous runway exhausted (branch `redesign`).** Hue-confinement
+  completeness: DISK R/W rate text moved off the net/warn hues to neutral `text` (bodies stay
+  green/neutral per D9). Synced records to "shipped": backlog `## Now` + architecture scope status now
+  state the RD0–RD5 redesign is complete; recorded the **B3** reassessment (disk sparkline doesn't fit
+  the compact tier-3 → recommend drop). Skipped fixed-height proc lists as near-zero-value (a real Mac
+  always has ≥3 processes, so the list never shrinks in practice). `pnpm verify` PASS (69).
+  **⏸ Pausing the loop here:** the redesign + its polish are done and no unblocked autonomous item
+  remains. What's left is owner-gated — **B2/B3/B6** (feature/placement calls for the opinionated
+  dashboard, D1/D5), **Q2** (VOUCHED-blocked dark `dim` hex), and an owner **push** of the 13 local
+  `redesign` commits.
+
 - **RD5 — responsive (2-tier) → REDESIGN COMPLETE (branch `redesign`).** Threaded the width seam (the
   long-standing D4 catch): `main.ts` passes the `COLUMNS`-derived width as a `columns` prop to `App`,
   and `App`'s responsive `width` prefers it (`props.columns || useWindowSize().columns || 120`) — so

@@ -15,7 +15,9 @@ Status: `TODO` · `WIP` · `DONE` · `BLOCKED (reason)` · `DROPPED` · `DEFERRE
 
 ## Now
 
-_(pick RD0 — top of Redesign.)_
+_**Redesign (RD0–RD5) COMPLETE — 2026-06-21.** No unblocked autonomous items remain. What's left is
+owner-gated: **B2/B3/B6** are deferred feature calls (placement / whether-to-add for the opinionated
+single dashboard — D1/D5), **Q2** is VOUCHED-blocked, and the redesign commits await an owner push._
 
 ## Redesign (RD-series — do top-down; gate everything behind RD0–RD0c)
 
@@ -153,7 +155,10 @@ _(pick RD0 — top of Redesign.)_
   on the new visual contract, not the old one. (`system_profiler SPBluetoothDataType`, follow
   collector→panel pattern; verify on a real Mac per D6.)
 - **B3 — Disk I/O history sparkline** · `DEFERRED` — Disk is demoted to the tier-3 strip (D9/DESIGN.md);
-  reassess whether a sparkline still fits before building.
+  reassess whether a sparkline still fits before building. **Reassessed 2026-06-21:** Disk is now a
+  compact tier-3 panel; a history sparkline conflicts with the compact "status" intent (Principle 4 —
+  Disk earns the least real estate). Recommend DROP unless Disk regains room — owner's call. The R/W
+  rate numbers stay.
 - **B6 — Standalone Clock module** · `DEFERRED` — low priority; clock already in header.
 
 ## Dropped
