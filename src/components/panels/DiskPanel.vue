@@ -11,8 +11,10 @@ const props = defineProps<{ disk: DiskMetric }>();
 
 // Disk is low-value real estate, so it stays calm (its module hue) until near-full, when an
 // EARNED signal escalates: amber ≥85% "NEAR FULL", red ≥95% "FULL" (colour + text, non-hue safe).
+// Hue confinement (D9): the bar body stays the shared green accent when roomy, escalating to an
+// EARNED warn/bad only near-full — the disk module hue lives on the title/border/number, not the bar.
 const diskColor = computed(() =>
-  props.disk.usedPct >= 95 ? theme.bad : props.disk.usedPct >= 85 ? theme.warn : theme.disk,
+  props.disk.usedPct >= 95 ? theme.bad : props.disk.usedPct >= 85 ? theme.warn : theme.accent,
 );
 const diskState = computed(() =>
   props.disk.usedPct >= 95 ? "FULL" : props.disk.usedPct >= 85 ? "NEAR FULL" : "",

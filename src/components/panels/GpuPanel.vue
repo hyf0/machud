@@ -20,7 +20,7 @@ defineProps<{ gpu: GpuMetric; history: number[] }>();
     <Graph :values="history" :max="100" :height="3" :color="theme.gpu" />
 
     <Box>
-      <Bar :value="gpu.usage ?? 0" :width="14" :color="theme.gpu" />
+      <Bar :value="gpu.usage ?? 0" :width="14" :color="theme.accent" />
     </Box>
     <Box>
       <Text :color="theme.dim">vram {{ humanBytes(gpu.vram) }}</Text>

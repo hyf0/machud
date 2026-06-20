@@ -29,7 +29,7 @@ const pressureColor = (p: MemoryMetric["pressure"]) =>
 
     <Box>
       <Text :color="theme.dim">used </Text>
-      <Bar :value="memory.usedPct" :width="14" :color="theme.mem" />
+      <Bar :value="memory.usedPct" :width="14" />
     </Box>
     <Box>
       <Text :color="theme.dim">wired {{ humanBytes(memory.wired) }} · swap {{ humanBytes(memory.swapUsed) }}</Text>

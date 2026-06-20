@@ -33,7 +33,7 @@ const watts = computed(() => {
     </Box>
 
     <Box>
-      <Bar :value="battery.pct" :width="16" :color="theme.battery" />
+      <Bar :value="battery.pct" :width="16" :color="theme.accent" />
     </Box>
 
     <Box>

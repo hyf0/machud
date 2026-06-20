@@ -5,6 +5,16 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 9) — hue confinement (branch `redesign`).** Realized D9's vouched rule "green is the only
+  hue across panels": moved the meter BAR bodies off the per-module hue — MEM used bar → `levelColor`
+  (green→amber→red by load), DISK calm bar → accent green (escalates near-full), GPU util & BATTERY
+  level bars → fixed accent green (high GPU / full battery aren't "danger", so no levelColor). Each panel
+  KEEPS its module hue on title/border/hero number; only the bodies went green/neutral. verify's truecolor
+  gradient assertion still passes (MEM bar now gradients in green, 12 colours). `pnpm verify` PASS (67).
+  **EYEBALL — notable look change:** the dashboard is now green-forward with module colour only on
+  chrome+numbers (per D9). `FORCE_COLOR=3 node dist/machud.mjs` to judge; if you prefer module-coloured
+  bars, that's a D9 change — say so. **Minor follow-up:** Disk R/W text still uses net/warn hues.
+
 - **RD4 (part 8) — GPU history graph (branch `redesign`).** Upgraded the GPU panel's 1-row Sparkline
   to the braille `Graph` (height 3 — tier-2, shorter than the hero graphs), completing the "every util
   panel shows real history" density theme (CPU/MEM/GPU). Visual change — guarded by no-overflow@120 +
