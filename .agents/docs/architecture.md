@@ -29,7 +29,7 @@ src/
       cpu / memory / gpu / disk / network / battery / sensors / appearance / index(collectAll)
   components/
     Panel.vue Bar.vue Sparkline.vue        shared widgets
-    Graph.vue BigNumber.vue                braille area history + 5-row hero number (RD4)
+    Graph.vue BigNumber.vue CoreGrid.vue   braille history + hero number + per-core load grid (RD4)
     panels/*Panel.vue HeaderBar.vue        one per module
 ```
 

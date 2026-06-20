@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 3) — per-core grid coloured by load (branch `redesign`).** New `CoreGrid.vue`: one
+  mini-bar per core (block glyph, height ∝ load), **coloured by `levelColor` (load), not by cluster** —
+  E and P render as separate labelled groups; a single cluster (Intel) → one unlabelled row, never
+  `0P+0E` (DESIGN). Replaced the old single cluster-coloured cores row in CpuPanel. TDD: inject one
+  cluster of 70% cores → the grid must emit a warn-tier `▆` (`38;2;219;188;127`), which the old
+  cpu-green row never did; red→green (collision-free — `▆` comes only from the grid/sparklines, and
+  only the grid runs `levelColor`). `MIN_CHECKS` 62→63. `pnpm verify` PASS (63). **Follow-up:** the
+  CpuPanel P/E *average* bars still render both rows on a single cluster — minor; host is Apple Silicon.
+
 - **RD4 (part 2) — `BigNumber` hero number (branch `redesign`).** Added `src/lib/bignum.ts` (3×5
   block-figure font, 0–9 + `-`/space; `bigDigits()` joins glyphs with a 1-col gap → 5 rows) and
   `BigNumber.vue` (renders the rounded value as 5-row figures with a gentle same-hue top-bright ramp,

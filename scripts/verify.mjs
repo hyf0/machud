@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 62;
+const MIN_CHECKS = 63;
 
 let failures = 0;
 let total = 0;
@@ -331,6 +331,24 @@ for (const [lvl, want] of [
   const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { usage: 88 } }), COLUMNS: "120" };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("█ █ █ █"), "CPU hero renders a BigNumber (injected 88 → 5-row block figures)");
+}
+{
+  // Per-core grid (RD4): each core is coloured by ITS OWN load (levelColor), not its cluster — the
+  // small-multiples the old single cluster-coloured row couldn't show. Inject one cluster of mid-load
+  // (70% → ▆, warn-tier) cores; the grid must emit a WARN-coloured ▆ (dark #dbbc7f). The old row
+  // coloured every P core with the cpu accent (green), never warn. (▆ comes only from the cores grid /
+  // sparklines, and only the grid runs levelColor, so warn-▆ is collision-free.)
+  const cores = Array.from({ length: 8 }, () => ({ usage: 70, cluster: "P" }));
+  const env = {
+    ...process.env,
+    FORCE_COLOR: "3",
+    COLORTERM: "truecolor",
+    COLUMNS: "120",
+    MACHUD_TEST_APPEARANCE: "dark",
+    MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { cores, pCount: 8, eCount: 0 } }),
+  };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(/38;2;219;188;127m▆/.test(f), "CPU per-core grid colours each core by load (mid-load → warn-tier ▆)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME
