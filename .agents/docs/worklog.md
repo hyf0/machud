@@ -5,6 +5,16 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD0 — hardened the verify gate (safety net; branch `redesign`).** Closed the three confirmed
+  holes the adversarial reviews found: (a) `inRange` accepted `null` (a metric silently degrading to
+  `—` passed every range check) — split into a strict `inRange` (null/NaN → red, for present-required
+  metrics) and `inRangeOrNull` (GPU util / battery health stay honestly nullable); proved
+  `inRange(null)=false` now vs the old `true`. (b) The build check passed on a stale bundle even when
+  the build failed — now `rm`s `dist/machud.mjs` before building, so a failed build leaves it absent →
+  red. (c) Added an assertion-count pin (`MIN_CHECKS=40`) so deleting/loosening a check turns the gate
+  red, making autonomy.md's strengthen-only rule machine-enforced. `pnpm verify` PASS (41 assertions).
+  Filed **RD0d** for the heavier real-`npx` pack→install→exec gate (from the Task-2 review).
+
 - **Task 2 — `npx machud` runnable (D13; branch `redesign`).** Made the package publishable and the
   bin executable: removed `private: true`, added `files`/`engines`/`keywords`/`prepublishOnly`, moved
   dev-only `@vue-tui/cli` to devDependencies (the bundle only imports `@vue-tui/runtime` + `vue`), and

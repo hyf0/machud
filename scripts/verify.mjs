@@ -20,13 +20,21 @@ const pexec = promisify(execFile);
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const bundle = join(root, "dist", "machud.mjs");
 
+// Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
+// you must STOP-and-ask before removing one. A dropped count turns the gate RED.
+const MIN_CHECKS = 40;
+
 let failures = 0;
+let total = 0;
 const ok = (msg) => console.log(`  \x1b[32m✓\x1b[0m ${msg}`);
 const fail = (msg) => {
   failures++;
   console.log(`  \x1b[31m✗ ${msg}\x1b[0m`);
 };
-const check = (cond, msg) => (cond ? ok(msg) : fail(msg));
+const check = (cond, msg) => {
+  total++;
+  return cond ? ok(msg) : fail(msg);
+};
 
 async function run(cmd, args, opts = {}) {
   try {
@@ -41,8 +49,13 @@ console.log("\nmachud verify\n");
 
 // ── 1. Build ───────────────────────────────────────────────────────────────
 console.log("build");
+// Delete the bundle first: if the build FAILS, the bundle stays absent and this
+// check goes red — instead of silently passing on a stale artifact.
+const { rm } = await import("node:fs/promises");
+await rm(bundle, { force: true });
 const buildOut = await run("pnpm", ["build"]);
-check(/built in/.test(buildOut) || (await fileExists(bundle)), "bundle builds");
+check(await fileExists(bundle), "bundle builds fresh (no stale-pass)");
+void buildOut;
 
 // ── 2. JSON snapshot: structural + range invariants ─────────────────────────
 console.log("\ndata (--json)");
@@ -55,7 +68,11 @@ try {
 }
 
 if (m) {
-  const inRange = (v, lo, hi) => v == null || (typeof v === "number" && v >= lo && v <= hi);
+  const isNum = (v, lo, hi) => typeof v === "number" && !Number.isNaN(v) && v >= lo && v <= hi;
+  // present-REQUIRED: null/NaN FAILS (a silently-degraded metric must turn the gate red).
+  const inRange = (v, lo, hi) => isNum(v, lo, hi);
+  // honestly-nullable (e.g. no GPU util / no battery on this Mac): null is allowed.
+  const inRangeOrNull = (v, lo, hi) => v == null || isNum(v, lo, hi);
 
   // CPU
   check(Array.isArray(m.cpu.cores) && m.cpu.cores.length > 0, "cpu has cores");
@@ -70,13 +87,13 @@ if (m) {
   check(["Normal", "Elevated", "High"].includes(m.memory.pressure), "memory pressure valid");
 
   // GPU / Disk / Net
-  check(inRange(m.gpu.usage, 0, 100), "gpu usage null or 0–100");
+  check(inRangeOrNull(m.gpu.usage, 0, 100), "gpu usage null or 0–100");
   check(m.disk.total > 0 && inRange(m.disk.usedPct, 0, 100), "disk total>0 and usedPct in range");
   check(m.net.rxBps >= 0 && m.net.txBps >= 0, "net rates non-negative");
 
   // Battery / Sensors
   check(inRange(m.battery.pct, 0, 100), "battery pct in 0–100");
-  check(inRange(m.battery.healthPct, 0, 100), "battery health null or 0–100");
+  check(inRangeOrNull(m.battery.healthPct, 0, 100), "battery health null or 0–100");
   check(
     ["Nominal", "Fair", "Serious", "Critical"].includes(m.sensors.thermalPressure),
     "thermal pressure valid",
@@ -165,6 +182,10 @@ console.log("\npackaging (npx, D13)");
     `engines.node (${pkg.engines?.node}) >= @vue-tui/runtime floor (${rtEng})`,
   );
 }
+
+// ── 7. Gate strength (strengthen-only floor) ────────────────────────────────
+console.log("\ngate strength");
+check(total >= MIN_CHECKS, `ran ${total} assertions ≥ pinned floor ${MIN_CHECKS} (strengthen-only)`);
 
 // ── Summary ─────────────────────────────────────────────────────────────────
 console.log("");

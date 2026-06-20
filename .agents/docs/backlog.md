@@ -19,7 +19,11 @@ _(pick RD0 — top of Redesign.)_
 
 ## Redesign (RD-series — do top-down; gate everything behind RD0–RD0c)
 
-- **RD0 — Harden `verify.mjs` (the safety net)** · `TODO`
+- **RD0 — Harden `verify.mjs` (the safety net)** · `DONE`
+  Done: `inRange` split into strict (null/NaN → red, for present-required metrics) + `inRangeOrNull`
+  (GPU util / battery health stay nullable); build now `rm`s the bundle first so a failed build can't
+  pass on a stale artifact; assertion count pinned (`MIN_CHECKS=40`) so removing a check turns the gate
+  red. `pnpm verify` PASS. Original hole description:
   Three confirmed holes: (a) `inRange(null)` returns `true` → a metric silently going `—` passes
   every range check; (b) the build check passes on a stale bundle even when the build FAILS;
   (c) no strengthen-only / non-null regression guard. Fix: present-required values FAIL on null
@@ -46,6 +50,14 @@ _(pick RD0 — top of Redesign.)_
   into a **currently-shipping** metric and asserts the frame reflects it; verify green. (The
   battery-sign / pressure-1·2·4 / Intel-single-cluster / 96%-disk-`FULL` fixtures live in **RD2/RD3**,
   where those fields exist — not here.)
+
+- **RD0d — Real `npx` gate: pack → install → exec** · `TODO`
+  (From the Task-2 review.) verify's packaging section inspects the local checkout, not the published
+  artifact, so an install-time crash (e.g. the engines floor) could sail through green. Add: `npm pack`
+  to a temp dir, `npm install <tgz>` into a throwaway project, run `node_modules/.bin/machud --once`,
+  assert exit 0 + a panel title. Also assert `dist/machud.mjs` is in the `npm pack` file list (proves
+  `prepack` builds on a clean tree). Acceptance: the gate actually exercises shebang byte-0 + the +x
+  bit + dependency resolution; verify green. (Heavier/slower — keep it the last verify section.)
 
 - **RD1 — Reconcile DESIGN.md with code (theme + doc)** · `TODO`
   Rewrite `src/theme.ts` to the Everforest tokens in DESIGN.md (dark/light), and **pin the hex in
