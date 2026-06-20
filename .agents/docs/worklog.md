@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD3 (part 3) — gradient meters + D11 colour-tier fallback (branch `redesign`).** New
+  `src/lib/color.ts` (hex mix / same-hue `ramp` / `supportsTruecolor`). Bar.vue now renders each
+  filled cell as a **same-hue dim→accent gradient** on truecolor terminals, and degrades to the
+  **solid accent** below truecolor (D11). Key finding: vue-tui decides 24-bit emission from
+  `COLORTERM`, NOT the `FORCE_COLOR` level, so `supportsTruecolor()` keys off `COLORTERM` (matching
+  what the renderer actually emits). verify asserts the truecolor frame has many distinct 38;2
+  colours (gradient) and a 256-colour frame (COLORTERM unset) has none (clean degrade). `pnpm verify`
+  PASS (58). Remaining RD3: braille area Graph.
+
 - **RD3 (part 2) — disk earned near-full signal (branch `redesign`).** DiskPanel was hardcoded to
   the disk hue with no escalation. Now it stays calm (module hue) until near-full, then an EARNED
   signal escalates on both colour AND text: amber `NEAR FULL` ≥85%, red `FULL` ≥95% (the bar colour

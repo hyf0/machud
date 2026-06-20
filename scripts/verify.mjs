@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 56;
+const MIN_CHECKS = 58;
 
 let failures = 0;
 let total = 0;
@@ -318,6 +318,26 @@ for (const [lvl, want] of [
   const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ disk: { usedPct: 96 } }), COLUMNS: "120" };
   const f = await run("node", [bundle, "--once"], { env });
   check(f.includes("FULL"), "disk shows the earned near-full signal (96% → FULL)");
+}
+{
+  // Colour-tier / D11 (RD3): on a truecolor terminal (COLORTERM=truecolor) the meters render as
+  // 24-bit (38;2) same-hue gradients; on a 256-colour terminal (e.g. Terminal.app, COLORTERM
+  // unset) vue-tui downsamples — no 38;2 codes — and the gradient degrades to solid. Both render.
+  const hi = await run("node", [bundle, "--once"], {
+    env: { ...process.env, COLORTERM: "truecolor", FORCE_COLOR: "3", COLUMNS: "120" },
+  });
+  const lo = await run("node", [bundle, "--once"], {
+    env: { ...process.env, COLORTERM: "", FORCE_COLOR: "3", COLUMNS: "120" },
+  });
+  const distinctHi = new Set(hi.match(/38;2;\d+;\d+;\d+/g) ?? []).size;
+  check(
+    distinctHi > 8 && hi.includes("CPU") && !/NaN|undefined/.test(hi),
+    `truecolor renders 24-bit gradient meters (${distinctHi} distinct colours)`,
+  );
+  check(
+    !lo.includes("\x1b[38;2;") && lo.includes("CPU") && !/NaN|undefined/.test(lo),
+    "256-colour terminal degrades cleanly — no 24-bit codes",
+  );
 }
 
 // ── 9. Gate strength (strengthen-only floor) ────────────────────────────────
