@@ -5,6 +5,12 @@ anything to eyeball. Newest first.
 
 ## 2026-06-20
 
+- **RD4 (part 8) — GPU history graph (branch `redesign`).** Upgraded the GPU panel's 1-row Sparkline
+  to the braille `Graph` (height 3 — tier-2, shorter than the hero graphs), completing the "every util
+  panel shows real history" density theme (CPU/MEM/GPU). Visual change — guarded by no-overflow@120 +
+  panel-render; `pnpm verify` PASS (67). **Next:** tier-3 (Disk/Sensors) compaction, remaining
+  stability (fixed-height lists, right-aligned numerics), hue confinement, then RD5 (responsive).
+
 - **RD4 (part 7) — stability: battery power row always present (branch `redesign`).** Principle-8 fix
   for the owner's "rows jump / grow taller": the BATTERY `power` row was `v-if="watts"`, so it vanished
   with no charge flow (charged on AC, no adapter watts), shrinking the panel a row each time charging

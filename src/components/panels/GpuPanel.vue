@@ -2,7 +2,7 @@
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
-import Sparkline from "../Sparkline.vue";
+import Graph from "../Graph.vue";
 import { theme } from "../../theme";
 import { pct, humanBytes } from "../../lib/format";
 import type { GpuMetric } from "../../types";
@@ -17,7 +17,7 @@ defineProps<{ gpu: GpuMetric; history: number[] }>();
       <Text :color="theme.dim">render {{ pct(gpu.renderer) }}</Text>
     </Box>
 
-    <Sparkline :values="history" :max="100" :color="theme.gpu" />
+    <Graph :values="history" :max="100" :height="3" :color="theme.gpu" />
 
     <Box>
       <Bar :value="gpu.usage ?? 0" :width="14" :color="theme.gpu" />
