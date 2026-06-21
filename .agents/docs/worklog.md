@@ -5,11 +5,14 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
-- **Expanded the D17 test layer (branch `main`).** Added pure-function unit tests — format (`humanBytes`
-  incl. the 1024-rollover, `pct`/`temp`/`clamp`/`padEnd`), sparkline/`brailleArea`/`barCells` edge cases
-  (empty, width 0, overshoot, NaN, max 0), and `bigDigits` — plus component tests for MemoryPanel /
-  NetworkPanel / HeaderBar (the wide↔narrow header branch). 7 → **23 tests** across 5 files; `vp test`
-  23/23, `pnpm verify` **PASS (90)**.
+- **Expanded the D17 test layer to full coverage (branch `main`).** Added pure-function unit tests —
+  format (`humanBytes` incl. the 1024-rollover, `pct`/`temp`/`clamp`/`padEnd`), sparkline/`brailleArea`/
+  `barCells` edge cases (empty, width 0, overshoot, NaN, max 0), `bigDigits`, and color (`mix`/`ramp`
+  endpoints + the n=1 guard) — plus component tests for MemoryPanel / NetworkPanel / HeaderBar (the
+  wide↔narrow branch) and CoreGrid (E/P grouping vs the single-cluster fallback). 7 → **30 tests** across
+  7 files; `vp test` 30/30, `pnpm verify` **PASS (90)**. Coverage: all 9 panels/views + CoreGrid + every
+  pure lib (format/sparkline/bignum/color). The thin `.vue` wrappers (BigNumber/Bar/Graph/Sparkline) ride
+  on the unit-tested pure libs and the panel renders, so direct tests would be redundant — layer complete.
 
 - **Borrowed vue-tui's verification layer — `vp test` re-enabled + component render tests (D17; branch `main`).**
   Owner: study how vue-tui adds its test layer and adopt it. Shipped:
