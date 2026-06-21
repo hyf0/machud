@@ -5,6 +5,20 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Adversarial-review defect pass #3 — converged (branch `main`).** Final sweep of the surface the
+  first two passes didn't deeply cover: build/packaging config (`package.json`/`tsconfig`/`vite.config`),
+  `main.ts` entry branches, **process lifecycle / terminal safety**, and **render at boundary/extreme
+  widths**. **No real in-scope defects found.** Verified CLEAN with evidence: no devDependency leaks in
+  the bundle (only `vue`/`chalk`/`@vue-tui/runtime` + node builtins are externalized → `npx` can't crash
+  on a missing dep); **SIGINT/SIGTERM/SIGHUP all restore the alt screen** (`1049l` + cursor) via
+  @vue-tui/runtime's signal-exit teardown (terminal never left corrupted); SIGWINCH doesn't crash;
+  non-TTY degrades to one frame; **no render overflow at any COLUMNS 10→120** (wide fits exactly at the
+  100 breakpoint, narrow handles the rest); `tsc --noEmit` clean. No code change → gate stays green (89).
+  **Deferred for owner ruling (open-questions Q4/Q5):** unknown-flag/`--help` UX (product call) and the
+  repo-wide oxfmt drift (26 files — aesthetic call). Truly-latent, left as-is: panel-title clip (only
+  with synthetic 40–70-char model/iface names) and `clamp(NaN)` (unreachable — JSON can't carry NaN and
+  collectors clamp first). **Three adversarial passes done; the well is dry on real in-scope defects → loop stopped.**
+
 - **Adversarial-review defect pass #2 (branch `main`).** Two more reviewers (components / gate-coverage
   + borderline re-exam) + `vp check`; each finding re-verified before fixing. **Defects fixed (TDD):**
   - **battery `finishing charge` mislabeled (B1).** `\bcharging\b` matches the word "charging", not
