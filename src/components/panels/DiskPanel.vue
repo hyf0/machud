@@ -23,7 +23,7 @@ const diskState = computed(() =>
 </script>
 
 <template>
-  <Panel title=" DISK" :accent="theme.disk" :minWidth="22">
+  <Panel title=" DISK" :accent="theme.disk" :flexGrow="3" :minWidth="22">
     <template #header-right>
       <Text :color="theme.dim">{{ disk.mount }}</Text>
     </template>

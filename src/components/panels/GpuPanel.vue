@@ -11,7 +11,7 @@ defineProps<{ gpu: GpuMetric; history: number[] }>();
 </script>
 
 <template>
-  <Panel title=" GPU" :accent="theme.gpu" :minWidth="22">
+  <Panel title=" GPU" :accent="theme.gpu" :flexGrow="6" :minWidth="22">
     <Box justifyContent="space-between">
       <Text :color="theme.gpu" bold>{{ pct(gpu.usage) }}</Text>
       <Text :color="theme.dim">render {{ pct(gpu.renderer) }}</Text>

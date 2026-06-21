@@ -7,10 +7,13 @@ withDefaults(
     title: string;
     accent?: string;
     flexGrow?: number;
+    flexBasis?: number;
     minWidth?: number;
     width?: number | string;
   }>(),
-  { accent: theme.frame, flexGrow: 1 },
+  // flexBasis 0: a content-heavy panel (e.g. DISK) won't bloat its column past its flexGrow share,
+  // so the vertical seams between panels stay where the ratios put them (and align across rows).
+  { accent: theme.frame, flexGrow: 1, flexBasis: 0 },
 );
 </script>
 
@@ -18,6 +21,7 @@ withDefaults(
   <Box
     flexDirection="column"
     :flexGrow="flexGrow"
+    :flexBasis="flexBasis"
     :minWidth="minWidth"
     :width="width"
     borderStyle="round"

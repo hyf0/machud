@@ -19,7 +19,7 @@ const pressureColor = computed(() =>
 </script>
 
 <template>
-  <Panel title=" SENSORS" :accent="theme.sensor" :minWidth="24">
+  <Panel title=" SENSORS" :accent="theme.sensor" :flexGrow="2" :minWidth="24">
     <Box justifyContent="space-between">
       <Text :color="theme.dim">thermal</Text>
       <Text :color="pressureColor" bold>{{ sensors.thermalPressure }}</Text>

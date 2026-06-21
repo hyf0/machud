@@ -82,8 +82,8 @@ try {
 
       <Box flexDirection="row" :gap="1">
         <NetworkPanel :net="m.net" :rx="hist.rx" :tx="hist.tx" />
-        <GpuPanel :gpu="m.gpu" :history="hist.gpu" />
         <BatteryPanel :battery="m.battery" />
+        <GpuPanel :gpu="m.gpu" :history="hist.gpu" />
       </Box>
 
       <Box flexDirection="row" :gap="1">

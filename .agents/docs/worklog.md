@@ -5,6 +5,17 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Panel-seam alignment — shared 60% divider (branch `main`).** Owner spotted the panel edges didn't
+  line up across the 3 tiers. Root cause: each row had a different panel count (2/3/2) AND panels sized
+  to their CONTENT (DISK's long R/W + io row bloated it to ~80% of its row, skewing the seam). Fix:
+  `flexBasis:0` on Panel (size by flexGrow ratio, not content) so a content-heavy panel stays in its
+  column; tuned ratios for a shared **60% divider** — tier-1 CPU 3:MEM 2, tier-3 DISK 3:SENSORS 2,
+  tier-2 reordered to **NET · BATTERY · GPU** (2:1:6) so GPU's graph fills the right 40% column and
+  Battery stays compact (a wide-but-empty Battery was the alternative to the reorder). Right panels now
+  align at col 67–68 across all rows; new verify assertion pins it (right-edge cols within 2).
+  `MIN_CHECKS` 71→72, `pnpm verify` PASS (72). Note: tier-2 ratios are tuned to the current minWidths
+  (vue-tui's flexBasis floors at minWidth); the inner NET|BAT seam is the unavoidable 3rd-panel line.
+
 - **Owner review applied + B3 disk I/O sparkline (branch `redesign`).** Owner ruled the pending
   decisions: **Q2** → dark `dim` `#5c6a64`→`#7a8478` (Everforest grey0; fixed in DESIGN.md + theme.ts,
   pin holds); **B2 Bluetooth** + **B6 clock** DROPPED; **kept** the green-forward bars (the earlier

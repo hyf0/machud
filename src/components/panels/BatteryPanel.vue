@@ -22,7 +22,7 @@ const watts = computed(() => {
 </script>
 
 <template>
-  <Panel title=" BATTERY" :accent="theme.battery" :minWidth="24">
+  <Panel title=" BATTERY" :accent="theme.battery" :flexGrow="1" :minWidth="24">
     <template #header-right>
       <Text :color="theme.dim">{{ battery.charging ? "⇡ charging" : battery.state }}</Text>
     </template>

@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 71;
+const MIN_CHECKS = 72;
 
 let failures = 0;
 let total = 0;
@@ -165,6 +165,19 @@ check(/[⠁-⣿]/.test(frame), "braille area history graph renders (filled brail
 // stdout frame checks above can't see them — capture both streams via runExit.
 const rWarn = await runExit("node", [bundle, "--once"], { cwd: root, env: { ...process.env, COLUMNS: "120" } });
 check(!rWarn.out.includes("[Vue warn]"), "no Vue render warnings (clean stderr)");
+// Panel-seam alignment: the major vertical divider must line up across the 3 tiers. Per tier's
+// border-top row, take the RIGHT panel's left corner (last ╭); they must align within a couple cols.
+{
+  const corners = stripAnsi(frame)
+    .split("\n")
+    .filter((l) => l.includes("╭"))
+    .map((l) => {
+      const cs = [...l].flatMap((c, j) => (c === "╭" ? [j] : []));
+      return cs[cs.length - 1];
+    });
+  const aligned = corners.length >= 3 && Math.max(...corners) - Math.min(...corners) <= 2;
+  check(aligned, `panel seams align across tiers (right-edge cols ${corners.join("/")})`);
+}
 
 // ── 4. Appearance modes ────────────────────────────────────────────────────
 console.log("\nappearance");
