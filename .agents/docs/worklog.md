@@ -5,6 +5,18 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Manual theme toggle — `t` cycles auto→light→dark (D16, VOUCHED; branch `main`).** Owner asked for
+  one in-app theme control and vouched the design: default stays `auto` (follow macOS, D8); `t` cycles
+  **auto→light→dark→auto**; the override is **ephemeral** (no file, no flag — every launch starts at
+  `auto`), so D1's zero-config promise still holds. New decision **D16** — it reopens D8's "no in-app
+  switch" clause (allowed by the provenance rule, owner's say-so). Corrected the now-false "no theme
+  switcher" claim across README / AGENTS(CLAUDE) / DESIGN / architecture / backlog. **Impl:** pure
+  cyclic `nextThemeMode()` in `theme.ts`; `themeOverride` ref in `App.vue` resolves `auto`→live system
+  reading, else forces the palette; footer hint `t theme`. **TDD:** wrote 6 failing assertions first
+  (5 deterministic via a new `MACHUD_TEST_THEME_PRESSES` seam that replays the real cycle through
+  `--once`, using panel-title colour as the light/dark discriminator; 1 flash-proof live PTY keystroke),
+  watched them RED, then implemented to GREEN. `MIN_CHECKS` 73→79, `pnpm verify` PASS (79).
+
 - **Dropped the disk I/O sparkline (B3 reverted; branch `main`).** Owner: a sparkline that auto-scales
   (steady I/O → all-full █, looks maxed) and floats when history is sparse is misleading — and the exact
   R/W numbers already convey I/O. Fully reverted B3: removed the `io` row, the `dio` history ring

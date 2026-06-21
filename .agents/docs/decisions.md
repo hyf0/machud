@@ -109,10 +109,15 @@ junk and broke the "polished, app-like" feel.
 Owner ruling on 2026-06-20: machud supports both light and dark palettes and
 chooses between them by following the macOS system appearance preference.
 
-This is compatible with D1 because it is **not** a user-facing theme setting:
-there is no config file, no CLI flag, and no in-app switch. The app simply adapts
-to the system preference. Verification may use an internal test override to
-exercise both palettes, but that is not product surface.
+This is compatible with D1 because it is **not** a persisted theme setting:
+there is no config file and no CLI flag. By default the app simply adapts to the
+system preference. Verification may use an internal test override to exercise both
+palettes, but that is not product surface.
+
+> **Update 2026-06-21 (see D16):** the original "no in-app switch" stance was
+> reopened by the owner. The `t` key now cycles an **ephemeral** auto→light→dark
+> override. `auto` stays the default and behaves exactly as above; the override
+> persists nothing, so the zero-config promise (no file, no flag) still holds.
 
 Dark is the **hero** look (the cool/gradient identity glows on dark). Light is a **faithful,
 lower-drama daylight mode** — gradients compress and it cannot glow, which is acceptable by
@@ -198,3 +203,33 @@ Owner ruling 2026-06-20. The top-left logo splits the word: **`mac`** in Apple a
   DESIGN.md `silver` token; an owner-directed extension of the D9 palette.
 - **Don't:** flatten the wordmark to one colour, swap which half is silver vs green, or drop the
   `silver` token.
+
+## D16. Manual theme toggle — `t` cycles auto→light→dark  [VOUCHED @hyf0]
+
+Owner ruling 2026-06-21. machud gains exactly **one** in-app control: the `t` key
+cycles the theme through **auto → light → dark → auto**. `auto` (the default)
+follows the macOS system appearance exactly as D8 describes; `light`/`dark` force
+that palette for the session.
+
+This deliberately **reopens D8's "no in-app switch" clause** — permitted by the
+provenance rule (a human's say-so). It stays compatible with **D1 ("not
+configurable")** because the override is **ephemeral and zero-config**: nothing is
+written to disk, there is no config file and no CLI flag, and every launch starts
+at `auto`. It is a transient *view control*, not a persisted *setting* — the
+curated, system-following experience is still exactly what you get out of the box.
+
+**Why:** the owner wants to preview the non-system palette (e.g. show dark for a
+screenshot/demo) without flipping all of macOS, and to override a terminal whose
+appearance disagrees with the system. `auto` staying the default keeps the
+opinionated, zero-config story intact.
+
+- **Implementation:** `nextThemeMode()` in `src/theme.ts` is the pure cyclic
+  source of truth; an `themeOverride` ref in `App.vue` resolves `auto` → the live
+  system reading, else forces the chosen palette via `setThemeMode`. The `t` key
+  (alongside `q`) advances the cycle. Footer hint: `t theme`.
+- **Verify:** `MACHUD_TEST_THEME_PRESSES=N` applies the real cycle N times from
+  `auto`, so `--once` exercises the exact key-press contract deterministically
+  (panel title colour is the light/dark discriminator); a flash-proof PTY test
+  presses `t` live. See the "theme toggle (D16)" block in `scripts/verify.mjs`.
+- **Settled:** the key (`t`), the order (auto→light→dark), `auto` as default, and
+  the no-persistence rule. Reopen only with @hyf0.

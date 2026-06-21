@@ -63,9 +63,11 @@ Goal: open-the-box, no password prompt. Everything below is unprivileged.
   excluding reclaimable file cache, so it doesn't read ~95% on a cache-heavy Mac.
 - **Sensors:** die temps and fan RPM require SMC reads (sudo) → shown as "—". We
   surface thermal pressure + battery pack temp, which ARE free.
-- **Appearance:** light/dark follows macOS system preference automatically. There
-  is no user-facing theme switch; `MACHUD_TEST_APPEARANCE` exists only so
-  `pnpm verify` can exercise both palettes without changing host settings.
+- **Appearance:** light/dark follows macOS system preference automatically by
+  default; the `t` key cycles an ephemeral auto→light→dark override (D16, nothing
+  persisted). `MACHUD_TEST_APPEARANCE` sets the system reading and
+  `MACHUD_TEST_THEME_PRESSES` replays the cycle, so `pnpm verify` can exercise both
+  palettes without changing host settings or driving a live keyboard.
 
 There is **no** "enhanced mode." A sudo/powermetrics path was considered and **dropped** (D2,
 2026-06-20): precise per-cluster load, GPU/ANE watts, fan RPM, die temps, and total system power

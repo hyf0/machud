@@ -78,6 +78,19 @@ export function setThemeMode(mode: AppearanceMode): void {
   Object.assign(theme, palettes[mode]);
 }
 
+// Manual theme control (D16, owner-vouched). `auto` follows the macOS system
+// appearance (the default, D8); `light`/`dark` force a palette regardless. The
+// `t` key cycles auto→light→dark→auto. The override is ephemeral — nothing is
+// ever persisted, so machud is still zero-*config* (no file, no flag), it just
+// gained one in-app switch. `auto` keeps system-following the default experience.
+export type ThemeOverride = "auto" | AppearanceMode;
+const THEME_CYCLE: readonly ThemeOverride[] = ["auto", "light", "dark"];
+
+export function nextThemeMode(cur: ThemeOverride): ThemeOverride {
+  // indexOf returns -1 for an unknown value → (-1 + 1) % 3 = 0 → "auto" (safe).
+  return THEME_CYCLE[(THEME_CYCLE.indexOf(cur) + 1) % THEME_CYCLE.length];
+}
+
 // Green → amber → red as a percentage climbs. Used for load bars.
 export function levelColor(pct: number): string {
   if (pct >= 85) return theme.bad;

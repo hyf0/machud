@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 73;
+const MIN_CHECKS = 79;
 
 let failures = 0;
 let total = 0;
@@ -219,6 +219,49 @@ const pty = await run("sh", ["-c", `cat -v ${raw} 2>/dev/null; rm -f ${raw}`]);
 check(pty.includes("1049h"), "enters alternate screen (1049h)");
 check(pty.includes("1049l"), "restores on quit (1049l)");
 check(pty.includes("macOS system monitor"), "dashboard renders inside alt screen");
+
+// ── 5b. Manual theme toggle: `t` cycles auto→light→dark (D16) ────────────────
+// D16 (owner-vouched): the default stays `auto` (follow macOS appearance); `t`
+// cycles auto→light→dark→auto. The override is ephemeral (nothing is persisted)
+// and wins over the system appearance while set. MACHUD_TEST_THEME_PRESSES applies
+// the REAL cycle N times from `auto`, so `--once` can exercise the exact key-press
+// contract deterministically. The panel TITLE colour is a clean light/dark
+// discriminator (flat, never a gradient endpoint), so it never cross-contaminates.
+console.log("\ntheme toggle (D16)");
+const DARK_TITLE = "38;2;211;198;170"; // theme.dark.title  #d3c6aa
+const LIGHT_TITLE = "38;2;92;106;114"; // theme.light.title #5c6a72
+const toggleFrame = (presses, sysMode) =>
+  run("node", [bundle, "--once"], {
+    env: { ...process.env, FORCE_COLOR: "3", COLUMNS: "120", MACHUD_TEST_APPEARANCE: sysMode, MACHUD_TEST_THEME_PRESSES: String(presses) },
+  });
+{
+  const f0 = await toggleFrame(0, "dark");
+  check(f0.includes(DARK_TITLE) && !f0.includes(LIGHT_TITLE), "0 presses = auto: follows a dark system (dark palette)");
+
+  const f1 = await toggleFrame(1, "dark");
+  check(f1.includes(LIGHT_TITLE) && !f1.includes(DARK_TITLE), "press 1: auto→light overrides a dark system");
+
+  const f2 = await toggleFrame(2, "light");
+  check(f2.includes(DARK_TITLE) && !f2.includes(LIGHT_TITLE), "press 2: auto→light→dark overrides a light system");
+
+  const f3d = await toggleFrame(3, "dark");
+  check(f3d.includes(DARK_TITLE) && !f3d.includes(LIGHT_TITLE), "press 3: cycle wraps to auto (dark system→dark)");
+
+  const f3l = await toggleFrame(3, "light");
+  check(f3l.includes(LIGHT_TITLE) && !f3l.includes(DARK_TITLE), "press 3: cycle wraps to auto (light system→light)");
+}
+// Real keystroke through a PTY proves the `t` key is wired (not just the env seam).
+// System=light, so the startup flash AND every auto frame are light — a DARK title
+// can therefore only appear if `t` actually cycled auto→light→dark. Flash-proof.
+{
+  const tRaw = join(root, "dist", ".verify-toggle.raw");
+  await run("sh", [
+    "-c",
+    `( sleep 2.5; printf 't'; sleep 0.3; printf 't'; sleep 1.3; printf 'q' ) | COLUMNS=120 LINES=45 FORCE_COLOR=3 MACHUD_TEST_APPEARANCE=light script -q ${tRaw} node ${bundle} >/dev/null 2>&1 || true`,
+  ]);
+  const toggled = await run("sh", ["-c", `cat -v ${tRaw} 2>/dev/null; rm -f ${tRaw}`]);
+  check(toggled.includes(DARK_TITLE), "live `t`×2 cycles auto→light→dark (PTY keystroke wired)");
+}
 
 // ── 6. Packaging: `npx machud` must be runnable (D13) ───────────────────────
 console.log("\npackaging (npx, D13)");

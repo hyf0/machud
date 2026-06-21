@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { Box, Text, useWindowSize, useInput, useApp } from "@vue-tui/runtime";
 import { useMetrics } from "./composables/useMetrics";
 import { emptyMetrics } from "./lib/empty";
-import { theme, setThemeMode } from "./theme";
+import { theme, setThemeMode, nextThemeMode, type ThemeOverride } from "./theme";
 import type { Metrics } from "./types";
 import HeaderBar from "./components/panels/HeaderBar.vue";
 import CpuPanel from "./components/panels/CpuPanel.vue";
@@ -46,7 +46,20 @@ const hist = computed(() => {
   };
 });
 
-watchEffect(() => setThemeMode(m.value.appearance.mode));
+// Manual theme override (D16, owner-vouched): default `auto` follows the macOS
+// appearance (D8); `t` cycles auto→light→dark→auto. It's ephemeral — never
+// persisted. The test seam applies the SAME cycle N times from `auto`, so the
+// --once gate exercises the exact key-press contract without a live keyboard.
+const seedPresses = Number(process.env.MACHUD_TEST_THEME_PRESSES);
+const themeOverride = ref<ThemeOverride>("auto");
+if (Number.isFinite(seedPresses) && seedPresses > 0) {
+  for (let i = 0; i < seedPresses; i++) themeOverride.value = nextThemeMode(themeOverride.value);
+}
+// `auto` follows the system reading; an explicit light/dark wins over it.
+const effectiveMode = computed(() =>
+  themeOverride.value === "auto" ? m.value.appearance.mode : themeOverride.value,
+);
+watchEffect(() => setThemeMode(effectiveMode.value));
 
 // Exit cleanly via the app lifecycle so the alternate screen is restored on quit.
 // Ctrl+C is handled by mount's exitOnCtrlC. Both useApp/useInput are unavailable
@@ -61,6 +74,7 @@ try {
 try {
   useInput((input) => {
     if (input === "q") quit();
+    else if (input === "t") themeOverride.value = nextThemeMode(themeOverride.value);
   });
 } catch {
   // useInput is unavailable in one-shot render mode; ignore.
@@ -94,7 +108,7 @@ try {
     <NarrowView v-else :m="m" />
 
     <Box :paddingX="1">
-      <Text :color="theme.dim">{{ width >= 100 ? "q quit · refresh 1s" : "q quit" }}</Text>
+      <Text :color="theme.dim">{{ width >= 100 ? "q quit · t theme · refresh 1s" : "q quit · t theme" }}</Text>
     </Box>
   </Box>
 </template>

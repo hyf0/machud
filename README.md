@@ -8,7 +8,7 @@
 
 ---
 
-**machud is opinionated — that's the whole point.** Where [btop](https://github.com/aristocratos/btop) wins on deep configurability, machud wins on *beautiful + zero-config*: no settings, no theme switcher, no layout knobs. The single curated wide-screen dashboard — Apple-Silicon-aware, system-following light/dark — **is** the product. Want to tune everything yourself? Use btop. machud is the considered default that looks right out of the box and never asks for your password.
+**machud is opinionated — that's the whole point.** Where [btop](https://github.com/aristocratos/btop) wins on deep configurability, machud wins on *beautiful + zero-config*: no settings, no config files, no layout knobs. The single curated wide-screen dashboard — Apple-Silicon-aware, following your macOS light/dark (or press `t` to override) — **is** the product. Want to tune everything yourself? Use btop. machud is the considered default that looks right out of the box and never asks for your password.
 
 <p align="center">
   <img alt="machud dashboard" src="https://raw.githubusercontent.com/hyf0/machud/main/.github/assets/screenshot.png" width="860">

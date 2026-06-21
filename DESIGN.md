@@ -14,7 +14,7 @@ meta:
   name: machud
   mood: "cool but refined — a calm, green-forward instrument; striking, never harsh"
   basis: "Everforest — a low-strain, muted, eye-friendly scheme; green-forward, using Everforest's own green"
-  appearance: "follows macOS system light/dark automatically (D8); no user theme switch"
+  appearance: "follows macOS system light/dark automatically (D8); ephemeral t-key override auto→light→dark (D16)"
 
 # --- COLORS (TARGET) — the source of truth. src/theme.ts MUST be rewritten to these
 #     tokens (it is still Tokyo Night today — backlog RD1); verify.mjs pins the hex so
@@ -180,7 +180,7 @@ Rules (*Refactoring UI*, Few, Tufte's *smallest effective difference*):
   (no gradient), 16 → muted named ANSI. Never let a muted hex snap to a saturated basic color
   (the neon the Don'ts forbid). Judge "cool but refined" through the real chalk path at level 2/1,
   not the raw-truecolor prototype.
-- **Light/dark follows macOS** automatically (D8); no theme switch (D1). Light is a **faithful,
+- **Light/dark follows macOS** automatically (D8); a manual `t`-key override cycles auto→light→dark, ephemeral (D16). Light is a **faithful,
   lower-drama daylight mode**: gradients compress, it cannot glow, and that is acceptable by
   physics — but hero, alignment, and status colours must read as **deliberate** on the cream base.
   Light is not a downgrade; it has the same quality bar minus glow.

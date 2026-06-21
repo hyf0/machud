@@ -173,7 +173,7 @@ single dashboard — D1/D5), **Q2** is VOUCHED-blocked, and the redesign commits
 
 ## Done
 
-- **B1 — Resolve Dark-mode vs D1** · `DONE` — light/dark follow macOS appearance, no switch (D8).
+- **B1 — Resolve Dark-mode vs D1** · `DONE` — light/dark follow macOS appearance (D8); manual `t` override added later (D16).
 - CPU (P/E), Memory, GPU, Disk, Network, Battery, Sensors panels (the pre-redesign versions).
 - `--once` + `--json` snapshot modes · alternate-screen takeover (D7) · `pnpm verify` gate.
 - **Design session 2026-06-20:** DESIGN.md anchor written; no-sudo (D2/B5); CONTRIBUTING (D10);
