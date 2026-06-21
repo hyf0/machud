@@ -8,7 +8,6 @@ export interface History {
   mem: number[];
   rx: number[];
   tx: number[];
-  dio: number[]; // disk total I/O (read + write Bps) — B3 sparkline
 }
 
 const MAX_SAMPLES = 240;
@@ -18,7 +17,7 @@ const MAX_SAMPLES = 240;
 // skipped rather than queued.
 export function useMetrics(intervalMs = 1000) {
   const metrics = shallowRef<Metrics | null>(null);
-  const history = ref<History>({ cpu: [], gpu: [], mem: [], rx: [], tx: [], dio: [] });
+  const history = ref<History>({ cpu: [], gpu: [], mem: [], rx: [], tx: [] });
   const now = shallowRef(Date.now());
 
   let timer: ReturnType<typeof setInterval> | null = null;
@@ -44,7 +43,6 @@ export function useMetrics(intervalMs = 1000) {
       push(h.mem, m.memory.usedPct);
       push(h.rx, m.net.rxBps);
       push(h.tx, m.net.txBps);
-      push(h.dio, m.disk.readBps + m.disk.writeBps);
       history.value = { ...h };
     } finally {
       inFlight = false;

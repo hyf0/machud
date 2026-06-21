@@ -5,6 +5,13 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Dropped the disk I/O sparkline (B3 reverted; branch `main`).** Owner: a sparkline that auto-scales
+  (steady I/O → all-full █, looks maxed) and floats when history is sparse is misleading — and the exact
+  R/W numbers already convey I/O. Fully reverted B3: removed the `io` row, the `dio` history ring
+  (useMetrics + App), the `:history` prop, and the io-sparkline assertion. **GATE WEAKENED (sanctioned):**
+  `MIN_CHECKS` 74→73 — the io-sparkline check removed *with its feature*, per owner ruling. `pnpm verify`
+  PASS (73). DISK panel is now `%` / bar / `R W` / total — clean.
+
 - **DISK %-full bug + drop dead fan row (branch `main`).** Owner caught both. (1) **DISK usedPct was
   wrong** — it used df's "Used" column, which on APFS counts only the `/` volume (~4%), not the shared
   container; an ~80%-full disk read **4%** (and "16.6 GB used / 70 GB free" was self-contradictory).
