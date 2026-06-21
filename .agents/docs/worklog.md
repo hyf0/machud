@@ -5,6 +5,12 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Expanded the D17 test layer (branch `main`).** Added pure-function unit tests — format (`humanBytes`
+  incl. the 1024-rollover, `pct`/`temp`/`clamp`/`padEnd`), sparkline/`brailleArea`/`barCells` edge cases
+  (empty, width 0, overshoot, NaN, max 0), and `bigDigits` — plus component tests for MemoryPanel /
+  NetworkPanel / HeaderBar (the wide↔narrow header branch). 7 → **23 tests** across 5 files; `vp test`
+  23/23, `pnpm verify` **PASS (90)**.
+
 - **Borrowed vue-tui's verification layer — `vp test` re-enabled + component render tests (D17; branch `main`).**
   Owner: study how vue-tui adds its test layer and adopt it. Shipped:
   - **Un-broke `vp test`.** Root cause: the pnpm catalog used `@latest`, resolving vite-plus-core/CLI
