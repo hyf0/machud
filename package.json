@@ -1,8 +1,18 @@
 {
   "name": "machud",
-  "version": "0.0.0",
-  "description": "An opinionated, beautiful, zero-config macOS terminal system monitor — one curated dashboard you don't configure (a TUI reimagining of Stats).",
+  "version": "0.0.1",
+  "description": "A zero-config system monitor for the macOS terminal — one curated, opinionated dashboard you don't configure (a TUI reimagining of Stats).",
   "type": "module",
+  "license": "MIT",
+  "author": "Yunfei He <i.heyunfei@gmail.com>",
+  "homepage": "https://github.com/hyf0/machud#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyf0/machud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hyf0/machud/issues"
+  },
   "bin": {
     "machud": "dist/machud.mjs"
   },
