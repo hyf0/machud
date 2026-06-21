@@ -195,7 +195,7 @@ for (const mode of ["light", "dark"]) {
   check(themed?.appearance?.mode === mode, `${mode} mode selected`);
 
   const themedFrame = await run("node", [bundle, "--once"], { env });
-  check(themedFrame.includes("machud"), `${mode} mode frame renders`);
+  check(themedFrame.includes("CPU"), `${mode} mode frame renders`);
   check(!/NaN|undefined/.test(themedFrame), `${mode} mode frame has no NaN/undefined`);
 }
 

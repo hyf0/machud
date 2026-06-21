@@ -5,6 +5,12 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Footer trimmed (branch `main`).** Owner: the `zero-sudo · machud` tail in the bottom bar is
+  redundant (machud is already the top-left wordmark). Footer is now just `q quit · refresh 1s`.
+  Repointed the appearance "frame renders" assertion off the footer `machud` marker to the `CPU`
+  panel title (the header wordmark is `mac`+`hud` split by ANSI → not a contiguous "machud"). Same
+  check strength, better marker. `pnpm verify` PASS (72).
+
 - **Panel-seam alignment — shared 60% divider (branch `main`).** Owner spotted the panel edges didn't
   line up across the 3 tiers. Root cause: each row had a different panel count (2/3/2) AND panels sized
   to their CONTENT (DISK's long R/W + io row bloated it to ~80% of its row, skewing the seam). Fix:

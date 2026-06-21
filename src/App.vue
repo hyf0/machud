@@ -95,7 +95,7 @@ try {
     <NarrowView v-else :m="m" />
 
     <Box :paddingX="1">
-      <Text :color="theme.dim">{{ width >= 100 ? "q quit · refresh 1s · zero-sudo · machud" : "q quit" }}</Text>
+      <Text :color="theme.dim">{{ width >= 100 ? "q quit · refresh 1s" : "q quit" }}</Text>
     </Box>
   </Box>
 </template>
