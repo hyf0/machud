@@ -3,8 +3,7 @@
 </p>
 
 <p align="center">
-  A beautiful, zero-config terminal system monitor for macOS —<br>
-  a TUI reimagining of <a href="https://github.com/exelban/stats">Stats</a>, built with <a href="https://github.com/vuejs-ai/vue-tui">vue-tui</a>.
+  A zero-config system monitor for the macOS terminal.
 </p>
 
 ---
@@ -24,7 +23,7 @@ pnpm start      # run the live dashboard (needs a real TTY)
 Other entry points:
 
 ```bash
-pnpm dev                       # vue-tui dev with HMR
+pnpm dev                       # dev mode with HMR
 node dist/machud.mjs --once    # render ONE real-data frame to stdout and exit
 ```
 
@@ -42,4 +41,4 @@ machud is opinionated by design. **Bug reports are welcome; feature PRs opened w
 
 ## Credits
 
-A TUI homage to [Stats](https://github.com/exelban/stats) by [@exelban](https://github.com/exelban). Built with [vue-tui](https://github.com/vuejs-ai/vue-tui).
+machud was inspired by [Stats](https://github.com/exelban/stats) by [@exelban](https://github.com/exelban) — its idea, brought to the terminal.
