@@ -32,7 +32,7 @@ const palettes: Record<AppearanceMode, ThemePalette> = {
     frame: "#4f5b58",
     title: "#d3c6aa",
     text: "#9da9a0",
-    dim: "#5c6a64",
+    dim: "#7a8478",
     accent: "#a7c080",
     silver: "#c4c9cf",
 

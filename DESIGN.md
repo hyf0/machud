@@ -26,7 +26,7 @@ colors:
     frame:   "#4f5b58"   # muted border
     title:   "#d3c6aa"   # warm off-white, never #fff
     text:    "#9da9a0"
-    dim:     "#5c6a64"   # labels, tracks
+    dim:     "#7a8478"   # labels, tracks (Everforest grey0; was a #5c6a72 typo — Q2, owner-ruled)
     accent:  "#a7c080"   # PRIMARY accent — Everforest's own green
     silver:  "#c4c9cf"   # Apple aluminium — the "mac" half of the mac|hud wordmark [VOUCHED @hyf0, D15]
     module:

@@ -20,7 +20,7 @@ looks good on first launch beats any settings system.
 - **Don't:** add config files, layout customization, per-user widget arrangement,
   or a "focus/expand" interaction mode. The single curated dashboard IS the product.
 
-## D2. Zero-sudo first, layered degradation
+## D2. Zero-sudo first, layered degradation  [VOUCHED @hyf0]
 
 Open-the-box means **no password prompt on startup, ever.** Default data comes only
 from unprivileged commands (`sysctl`, `vm_stat`, `ioreg`, `pmset`, `netstat`, `df`,
@@ -140,7 +140,7 @@ is opinionated (D1), the contribution surface is intentionally narrow: **bug/com
 welcome; ideas as discussion-first issues; feature PRs opened without a prior agreed issue are
 closed directly; theming / feature / aesthetic changes are generally not accepted.**
 
-## D11. Truecolor is an enhancement, not a guarantee — color-tier fallback
+## D11. Truecolor is an enhancement, not a guarantee — color-tier fallback  [VOUCHED @hyf0]
 
 The gradient identity assumes 24-bit color, but macOS's **default Terminal.app is 256-color**.
 Without a fallback, same-hue ramps flatten to bands and muted hexes snap to saturated basic ANSI

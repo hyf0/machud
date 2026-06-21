@@ -8,16 +8,14 @@ Format: `Qn — question · status · default-taken (if any)`
 
 ## Open
 
-- **Q2 — dark `dim` is a typo'd hex** · `BLOCKED (touches VOUCHED D9)` · awaiting @hyf0
-  The RD1 palette review found `dim: "#5c6a64"` (dark) is not a real Everforest colour — it's a
-  one-byte typo of the light fg `#5c6a72` (72→64). It lives in DESIGN.md (the [VOUCHED] D9 palette)
-  and is mirrored verbatim in `theme.ts`, so it's not a desync and the pin can't catch it. Per
-  DESIGN.md's own rule, changing a [VOUCHED] value needs the owner's say-so. **Recommended fix:**
-  Everforest dark grey0 `#7a8478` (its labels/tracks grey). Impact: dark-mode dim text/tracks only;
-  no render breakage. When ruled: fix DESIGN.md dark `dim`, then mirror to theme.ts (the pin keeps
-  them in lockstep).
+_(none — all resolved.)_
 
 ## Resolved
+
+- **Q2 — dark `dim` is a typo'd hex** · `RESOLVED 2026-06-21` · ruled: **`#7a8478`**
+  Owner ruled the fix. Dark `dim` was `#5c6a64` — a one-byte typo of the light fg `#5c6a72` (72→64),
+  not a real Everforest colour. Changed to Everforest dark grey0 **`#7a8478`** in DESIGN.md + `theme.ts`
+  (the verify pin keeps them in lockstep). Dark-mode labels/tracks only; no render breakage.
 
 - **Q3 — accessibility support?** · `RESOLVED 2026-06-20` · ruled: **drop it**, [VOUCHED]
   Owner ruled a11y out of scope for this passive TUI. Reverted the `○◐●` status glyphs; status is
