@@ -39,13 +39,15 @@ readings, and doubles as a pipe-friendly snapshot.
   data sources or layout.
 - **TDD by default.** For behavior changes, write or extend the failing verification
   first, watch it fail when practical, implement the smallest fix, then make the gate
-  green. Because `vp test` is currently broken, `pnpm verify` is the primary test
-  harness; extend `scripts/verify.mjs` for new modules, metrics, rendering guarantees,
-  and terminal behavior.
+  green. `pnpm verify` is the primary harness — it builds, black-box-checks
+  `--once`/`--json`, drives a PTY, AND runs the `vp test` component layer. Extend
+  `scripts/verify.mjs` for modules / metrics / render / terminal guarantees; add
+  per-panel component render tests under `tests/`.
 
-> Note: `vp test` is currently broken by an upstream version skew between
-> `@voidzero-dev/vite-plus-core` (0.2.1) and `@voidzero-dev/vite-plus-test` (0.1.24).
-> Verify with `node dist/machud.mjs --once` until the toolchain realigns.
+> Note: `vp test` runs a vue-tui-style component layer — panels rendered via the runtime's
+> `renderToString` and asserted in `tests/*.test.ts` (happy-dom makes Vitest compile SFCs
+> client-side). The vite-plus toolchain is pinned to the matched **0.1.24** line in
+> `pnpm-workspace.yaml`; bump core/test/CLI together (vite-plus-test has no 0.2.x yet). (D17)
 
 <!--VITE PLUS START-->
 

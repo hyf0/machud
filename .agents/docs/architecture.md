@@ -75,9 +75,13 @@ stay omitted forever (D2 — left out, not shown as dead `—` rows). Never aski
 
 ## Verification
 
-`vp test` is broken by an upstream vite-plus version skew. The live path is
-`node dist/machud.mjs --once` — primes delta collectors, waits 700ms, reads real
-data, renders one frame, exits. No TTY needed.
+Two layers. **Component tests** (`vp test`, `tests/*.test.ts`) render each panel through the
+runtime's `renderToString` and assert on the output — borrowed from vue-tui's verification layer
+(happy-dom makes Vitest compile SFCs client-side; the vite-plus skew that once broke `vp test` is
+pinned to the matched 0.1.24 line in `pnpm-workspace.yaml` — see D17). The **black-box** path is
+`node dist/machud.mjs --once` — primes delta collectors, waits 700ms, reads real data, renders one
+frame, exits (no TTY). The `pnpm verify` gate runs BOTH: it invokes `vp test` first, then the
+`--once`/`--json` and PTY checks.
 
 The `pnpm verify` gate also exercises the **real `npx` artifact** (RD0d, D13): it `pnpm pack`s the
 package the way a pnpm project publishes (resolving `catalog:`, running `prepack`), `npm install`s the

@@ -5,6 +5,22 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Borrowed vue-tui's verification layer — `vp test` re-enabled + component render tests (D17; branch `main`).**
+  Owner: study how vue-tui adds its test layer and adopt it. Shipped:
+  - **Un-broke `vp test`.** Root cause: the pnpm catalog used `@latest`, resolving vite-plus-core/CLI
+    **0.2.1** against vite-plus-test **0.1.24** (no 0.2.x exists) → the test bin can't load. Pinned the
+    whole vite-plus toolchain to the matched **0.1.24** line in `pnpm-workspace.yaml` (vue-tui's
+    structural anti-skew). `vp build` + the npx artifact still green on this line.
+  - **Component tests** (`tests/panels.test.ts`, 7): render CPU/GPU/Disk/Battery/Sensors/NarrowView via
+    the runtime's `renderToString` (matched 0.1.0 — `@vue-tui/testing@0.0.3` is hard-pinned to runtime
+    0.0.3, so its `render()` is version-mismatched here) and assert title / headline value / degrade-to-`—`
+    / narrow content.
+  - **Config:** `vite.config.ts` `test` block (`defineConfig` from `vite-plus`): `FORCE_COLOR:"3"`,
+    `CI:"false"`, `environment:"happy-dom"` (flips Vitest to the client transform so `@vitejs/plugin-vue`
+    stops SSR-compiling SFCs — `renderToString` needs the client render fn). Added `happy-dom` devDep.
+  - **Enforced + documented:** `scripts/verify.mjs` runs `vp test` as its first step (`MIN_CHECKS` 89→90);
+    AGENTS/architecture/autonomy/decisions updated + new **D17**. `pnpm verify` **PASS (90)**, `vp test` **7/7**.
+
 - **Adversarial-review defect pass #3 — converged (branch `main`).** Final sweep of the surface the
   first two passes didn't deeply cover: build/packaging config (`package.json`/`tsconfig`/`vite.config`),
   `main.ts` entry branches, **process lifecycle / terminal safety**, and **render at boundary/extreme

@@ -50,6 +50,7 @@
     "@vitejs/plugin-vue": "^6",
     "@vue-tui/cli": "^0.0.3",
     "@vue-tui/testing": "^0.0.3",
+    "happy-dom": "^20.10.6",
     "typescript": "~6.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",

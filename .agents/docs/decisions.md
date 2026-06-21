@@ -81,8 +81,8 @@ per module (not all-at-once-half-baked).
 ## D6. Verify with real data, not guesses
 
 Parsers are written against **actual command output captured on a real Mac**, not
-assumed formats. The live verification path is `node dist/machud.mjs --once`
-(`vp test` is upstream-broken — see architecture.md).
+assumed formats. The live verification path is `node dist/machud.mjs --once`; component
+panels also get `vp test` render coverage (see D17 / architecture.md).
 
 - **Do:** before changing a collector's parsing, run the real command and read its
   output. After any change, confirm with `--once` showing plausible live values.
@@ -233,3 +233,30 @@ opinionated, zero-config story intact.
   presses `t` live. See the "theme toggle (D16)" block in `scripts/verify.mjs`.
 - **Settled:** the key (`t`), the order (auto→light→dark), `auto` as default, and
   the no-persistence rule. Reopen only with @hyf0.
+
+## D17. Component test layer — `vp test` re-enabled, panels rendered via `renderToString`
+
+Owner asked (2026-06-21) to borrow vue-tui's verification layer. Two things shipped:
+
+1. **`vp test` un-broken.** It failed because the catalog used `@latest`, pulling
+   vite-plus-core/CLI **0.2.1** while vite-plus-test has no 0.2.x (maxes at **0.1.24**) — the
+   split breaks the test bin ("Could not find 'vitest' bin entry"). Fixed the way vue-tui
+   structurally avoids skew: pin the whole toolchain to one matched line in
+   `pnpm-workspace.yaml` (`vite`→core@0.1.24, `vitest`→test@0.1.24, `vite-plus`@0.1.24). Bump
+   all three together when test ships a newer release. `vp build` still passes on this line.
+2. **Component render tests** (`tests/*.test.ts`): each panel is rendered with injected metrics
+   through the runtime's synchronous `renderToString(component, {columns})` — the same call
+   `--once` uses — and asserted on (title, headline value, degradation to `—`, narrow view).
+
+**Why `renderToString`, not `@vue-tui/testing`'s `render()`/`lastFrame()` (vue-tui's own harness):**
+the published `@vue-tui/testing@0.0.3` hard-pins `@vue-tui/runtime@0.0.3`, but machud runs runtime
+**0.1.0** — a mismatch with no matched testing release on npm. `renderToString` is exported by the
+runtime itself, so it matches 0.1.0 and needs no harness. Panels are pure props→frame; the only
+interactive surface (`t`/`q`) is already covered by the PTY checks in `scripts/verify.mjs`.
+
+**Config (`vite.config.ts`, `defineConfig` from `vite-plus`):** `FORCE_COLOR:"3"` + `CI:"false"`
+(keep chalk colour + vue-tui interactivity on) and `environment:"happy-dom"`. Vitest defaults to the
+node/SSR transform, which makes `@vitejs/plugin-vue` emit `ssrRender`; a browser-like env flips it to
+the CLIENT render fn that `renderToString` needs (vue-tui sidesteps this by testing in JSX, never
+importing SFCs — machud tests real `.vue` panels). `pnpm verify` runs `vp test` as its first step,
+so the layer is enforced by the single gate, not a side command.

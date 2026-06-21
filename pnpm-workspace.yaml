@@ -1,7 +1,11 @@
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
-  vite-plus: latest
+  # Pin the whole vite-plus toolchain to the matched 0.1.24 line. @latest pulls
+  # vite-plus-core/CLI 0.2.1, but vite-plus-test has no 0.2.x yet (maxes at 0.1.24),
+  # so the split breaks `vp test` ("Could not find 'vitest' bin entry"). Core, test,
+  # and the CLI must move together — bump all three when test ships a newer release.
+  vite: npm:@voidzero-dev/vite-plus-core@0.1.24
+  vitest: npm:@voidzero-dev/vite-plus-test@0.1.24
+  vite-plus: 0.1.24
 minimumReleaseAgeExclude:
   - '@vue-tui/runtime@0.1.0'
 overrides:

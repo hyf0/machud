@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 89;
+const MIN_CHECKS = 90;
 
 let failures = 0;
 let total = 0;
@@ -72,6 +72,18 @@ if (!built) {
   // downstream failures (json-parse, every panel, the count pin) that bury the cause.
   console.log("\n\x1b[31mverify: FAIL — build produced no dist/machud.mjs (see build output above)\x1b[0m\n");
   process.exit(1);
+}
+
+// ── 1b. Component render tests (`vp test`) ──────────────────────────────────
+// The vue-tui-style verification layer: each panel rendered through the runtime's
+// `renderToString` and asserted on (tests/*.test.ts). Run inside the gate so it
+// stays the single source of truth. `vp test` works now that the vite-plus skew is
+// pinned to the matched 0.1.24 line (pnpm-workspace.yaml); happy-dom flips SFC
+// compilation to client mode. Complements the black-box --once/--json checks below.
+console.log("\ncomponent tests (vp test)");
+{
+  const r = await runExit("pnpm", ["exec", "vp", "test", "run"], { cwd: root });
+  check(r.code === 0 && /passed/.test(r.out) && !/failed/.test(r.out), "vp test passes (component render layer)");
 }
 
 // ── 2. JSON snapshot: structural + range invariants ─────────────────────────

@@ -39,9 +39,10 @@ Behavior changes follow TDD:
 4. Refactor only after the gate is green.
 5. Record the changed test/verification surface in the worklog.
 
-Because `vp test` is currently broken, `pnpm verify` is the primary harness. Extend
+`pnpm verify` is the primary harness — it now also runs the `vp test` component layer (D17). Extend
 `scripts/verify.mjs` for new modules, metrics, parser invariants, render guarantees,
-theme/appearance behavior, and terminal lifecycle behavior. For collectors, prefer
+theme/appearance behavior, and terminal lifecycle behavior; add per-panel render tests under `tests/`.
+For collectors, prefer
 extracting parseable logic or adding structured assertions rather than relying only
 on a happy-path frame render.
 
@@ -67,7 +68,7 @@ Never declare success without the gate passing (no "should work").
 
 ## The gate: `pnpm verify`
 
-`scripts/verify.mjs` (pure node — independent of the broken `vp test`). It builds,
+`scripts/verify.mjs` (pure node). It runs `vp test` (the component render layer), builds,
 runs `--json` and asserts in-range values, runs `--once` and asserts every panel
 renders without NaN/undefined, and drives a PTY to confirm the alternate-screen
 takeover. **Extend it whenever you add a module or invariant** — a new panel must
