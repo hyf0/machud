@@ -195,18 +195,24 @@ A fixed-width grid has no fonts, so the **character set and ANSI weight are the 
 - **`⇡ / ⇣`** for charge direction (width-1; **never `⚡`**, a double-width emoji that breaks
   alignment and tofus on glyph-poor terminals). **`—`** = unavailable.
 
-## Layout (TARGET — not yet shipped; current code is the old flat 3-row grid)
+## Layout (SHIPPED — RD4)
 
 A **single curated wide layout** (D1: no config, no focus/expand) arranged as a **3-tier
 hierarchy** — important up top, minor compressed below:
 
 - **Tier 1 — hero (big, with history graph):** **CPU**, **Memory**.
-- **Tier 2 — medium:** **Network** (lead — owner-ranked above battery), **GPU**, **Battery**.
-  Battery is here, NOT in tier-1: its differentiation is its **data** (live PD wattage), not its
-  real estate, so it keeps full watts/health while ceding hero space.
+- **Tier 2 — medium:** **Network** (lead — owner-ranked above battery), **Battery**, **GPU**.
+  Ordered so **GPU** (with its history graph) fills the aligned right-hand column while **Battery**
+  stays compact in the middle — a wide-but-empty Battery was the alternative. Battery is here, NOT in
+  tier-1: its differentiation is its **data** (live PD wattage), not its real estate.
 - **Tier 3 — status strip (compact, one line):** **Disk**, **Sensors**, uptime, load.
 
 - **1-cell gutter** inside every panel; **1-cell gap** between panels.
+- **Cross-tier alignment:** all three tiers share one **~60% vertical divider** — the right-hand panels
+  (MEM / GPU / SENSORS) left-align to the same column, and the left panels (CPU / Network / Disk) share
+  the left edge. Achieved with `flexBasis:0` + tuned flexGrow ratios so content can't bloat a column;
+  **pinned by a verify assertion** (right-edge cols within 2) so it can't silently regress. The lone
+  exception is tier-2's inner Network|Battery seam (3 panels vs 2 — unavoidable).
 - **Alignment is non-negotiable** (in the wide layout, where bars render): every bar in a panel
   shares **one** label-column width and **one** bar width, so left edges, bar ends, and value
   columns form clean vertical rules. Pad labels to a fixed column; never let a label's length
