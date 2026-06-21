@@ -1,5 +1,6 @@
+import { execFileSync } from "node:child_process";
 import { sh } from "../exec";
-import type { AppearanceMetric } from "../../types";
+import type { AppearanceMetric, AppearanceMode } from "../../types";
 
 const TEST_APPEARANCE = "MACHUD_TEST_APPEARANCE";
 
@@ -21,4 +22,23 @@ export async function collectAppearance(): Promise<AppearanceMetric> {
   cached = { mode: /dark/i.test(out) ? "dark" : "light" };
   cachedAt = now;
   return cached;
+}
+
+// Synchronous sibling of collectAppearance, for the FIRST paint only: the async poll
+// lands ~100 ms after mount — too late to set the initial theme, so a dark-mode Mac
+// would flash the light palette. App.vue seeds its initial appearance with this.
+// Honors the same test hook; falls back to light (in light mode the key is absent and
+// `defaults` exits non-zero, which is itself the correct light signal).
+export function detectAppearanceSync(): AppearanceMode {
+  const testMode = process.env[TEST_APPEARANCE];
+  if (testMode === "dark" || testMode === "light") return testMode;
+  try {
+    const out = execFileSync("defaults", ["read", "-g", "AppleInterfaceStyle"], {
+      timeout: 1000,
+      stdio: ["ignore", "pipe", "ignore"],
+    }).toString();
+    return /dark/i.test(out) ? "dark" : "light";
+  } catch {
+    return "light";
+  }
 }

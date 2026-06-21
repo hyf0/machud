@@ -5,6 +5,33 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Adversarial-review defect pass (branch `main`).** Ran three independent reviewers (collectors /
+  render-lifecycle / docs-vs-code), each required to prove findings with `file:line` + a repro; then
+  re-verified every finding myself before fixing. **Code defects fixed (TDD):**
+  - **network.ts — wrong byte columns on address-less default routes.** `netstat -ibn` Link rows have
+    **10** fields for VPN/`utun*`/`lo0` (no MAC/Address column) vs **11** for `en0`; the hard-coded
+    `p[6]`/`p[9]` read Opkts as RX and Coll (always 0) as TX whenever the default route is a tunnel.
+    Fixed by indexing from the RIGHT (Ibytes `p[len-5]`, Obytes `p[len-2]`). Added `MACHUD_TEST_NET_IFACE`
+    + `MACHUD_TEST_NETSTAT` hooks; gate injects a 10-field utun row (→ 22492/19073, not 33/0) + an 11-field
+    en0 regression row.
+  - **network.ts — bogus rate spike on default-route change.** `prev` wasn't keyed by interface, so a
+    Wi-Fi↔Ethernet/VPN switch diffed a new iface's large lifetime counters against the old baseline →
+    one ~GB/s spike that also poisoned the sparkline ring. Now keyed by `iface` (rate 0 on change).
+  - **cpu.ts — frozen P/E split after a transient sysctl failure.** `clusterCounts()` cached on the
+    first call; a single startup `sysctl` miss froze the Intel fallback (all-P, eCount=0) for the whole
+    process. Now caches ONLY a real perflevel reading; the no-split fallback is returned uncached so a
+    later poll recovers. (Recovery is cross-poll → not gately; existing `NO_PERFLEVEL` test stays green.)
+  - **Startup light-theme flash on dark Macs.** The theme reactive + `emptyMetrics` both default to
+    light, so the live app painted ~9 light frames before the first poll resolved appearance (`--once`
+    has no flash — it paints a resolved snapshot). Added `detectAppearanceSync()` (sync `defaults read`,
+    test-hook-aware, light fallback); `App.vue` seeds the initial appearance with it (live path only).
+    Gate: a flash-proof PTY check (system=dark → **zero** light-title frames).
+  - **Doc reconciliation (separate commit):** corrected claims contradicted by the code — CONTRIBUTING's
+    "no theme switcher" (→ D16), DESIGN/decisions "still Tokyo Night" (RD1 shipped Everforest, gate-pinned),
+    and the sudo-only "render as `—`" claims (per D2 they're **omitted**, not dead `—` rows) across
+    README / AGENTS / DESIGN / architecture.
+  - `MIN_CHECKS` 79→82, `pnpm verify` **PASS (82)**.
+
 - **Manual theme toggle — `t` cycles auto→light→dark (D16, VOUCHED; branch `main`).** Owner asked for
   one in-app theme control and vouched the design: default stays `auto` (follow macOS, D8); `t` cycles
   **auto→light→dark→auto**; the override is **ephemeral** (no file, no flag — every launch starts at

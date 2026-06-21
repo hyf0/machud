@@ -20,9 +20,16 @@ async function clusterCounts(): Promise<{ p: number; e: number }> {
   // perflevel0 = performance cores, perflevel1 = efficiency cores.
   const p = nums[0] || 0;
   const e = nums[1] || 0;
-  // Intel / single-cluster Macs have no perflevel split → model as ONE P cluster, never 0P+0E.
-  counts = p + e === 0 ? { p: os.cpus().length, e: 0 } : { p, e };
-  return counts;
+  // Cache ONLY a real perflevel reading. p+e===0 means either a true Intel/single-
+  // cluster Mac OR a transient sysctl failure (sh() returns "" for both). Return the
+  // single-cluster fallback WITHOUT caching, so a later successful read can correct an
+  // Apple-Silicon Mac whose first sysctl briefly failed — instead of freezing the
+  // wrong all-P split for the whole process lifetime.
+  if (p + e > 0) {
+    counts = { p, e };
+    return counts;
+  }
+  return { p: os.cpus().length, e: 0 };
 }
 
 export async function collectCpu(): Promise<CpuMetric> {

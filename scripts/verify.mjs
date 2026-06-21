@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 79;
+const MIN_CHECKS = 82;
 
 let failures = 0;
 let total = 0;
@@ -262,6 +262,19 @@ const toggleFrame = (presses, sysMode) =>
   const toggled = await run("sh", ["-c", `cat -v ${tRaw} 2>/dev/null; rm -f ${tRaw}`]);
   check(toggled.includes(DARK_TITLE), "live `t`×2 cycles auto→light→dark (PTY keystroke wired)");
 }
+// Startup theme: no light-palette FLASH before the first poll on a dark-mode Mac. App seeds the
+// initial appearance synchronously (detectAppearanceSync) so the FIRST paint is already dark; the
+// async poll lands ~100 ms later — too late to set the initial theme. RED before the fix: the theme
+// reactive + emptyMetrics both default to light, so ~9 light frames paint before the poll flips.
+{
+  const flashRaw = join(root, "dist", ".verify-flash.raw");
+  await run("sh", [
+    "-c",
+    `( sleep 2.5; printf 'q' ) | COLUMNS=120 LINES=45 FORCE_COLOR=3 MACHUD_TEST_APPEARANCE=dark script -q ${flashRaw} node ${bundle} >/dev/null 2>&1 || true`,
+  ]);
+  const flash = await run("sh", ["-c", `cat -v ${flashRaw} 2>/dev/null; rm -f ${flashRaw}`]);
+  check(flash.includes(DARK_TITLE) && !flash.includes(LIGHT_TITLE), "no light-palette flash at startup on a dark system");
+}
 
 // ── 6. Packaging: `npx machud` must be runnable (D13) ───────────────────────
 console.log("\npackaging (npx, D13)");
@@ -395,6 +408,46 @@ for (const [lvl, want] of [
   check(
     j?.cpu?.eCount === 0 && j?.cpu?.pCount === j?.cpu?.cores?.length && j.cpu.pCount > 0,
     "cpu models a single cluster when no P/E split (Intel — never 0P+0E)",
+  );
+}
+{
+  // Provenance: network.ts parses `netstat -ibn` byte columns by indexing from the RIGHT
+  // (Ibytes = p[len-5], Obytes = p[len-2]). An address-less default route (utun*/VPN, lo0) has NO
+  // MAC column → 10 fields, not 11; the old fixed indices p[6]/p[9] would read Opkts as RX and
+  // Coll (always 0) as TX. Inject a 10-field utun row → rxTotal/txTotal must be the BYTE columns.
+  const env = {
+    ...process.env,
+    MACHUD_TEST_NET_IFACE: "utun9",
+    MACHUD_TEST_NETSTAT: "utun9 1380 <Link#30> 11 0 22492 33 0 19073 0",
+  };
+  let j = null;
+  try {
+    j = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(
+    j?.net?.rxTotal === 22492 && j?.net?.txTotal === 19073,
+    "network reads byte columns on an address-less default route (utun: 10-field row)",
+  );
+}
+{
+  // Regression: an interface WITH a MAC address has 11 fields; from-right indexing must still land
+  // on Ibytes/Obytes. Inject an en0 row → rxTotal/txTotal = the byte columns (88888/77777).
+  const env = {
+    ...process.env,
+    MACHUD_TEST_NET_IFACE: "en0",
+    MACHUD_TEST_NETSTAT: "en0 1500 <Link#14> aa:bb:cc:dd:ee:ff 11 0 88888 33 0 77777 0",
+  };
+  let j = null;
+  try {
+    j = JSON.parse(await run("node", [bundle, "--json"], { env }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(
+    j?.net?.rxTotal === 88888 && j?.net?.txTotal === 77777,
+    "network reads byte columns on an 11-field row (en0 regression — from-right indexing)",
   );
 }
 {

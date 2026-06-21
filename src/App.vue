@@ -4,6 +4,7 @@ import { Box, Text, useWindowSize, useInput, useApp } from "@vue-tui/runtime";
 import { useMetrics } from "./composables/useMetrics";
 import { emptyMetrics } from "./lib/empty";
 import { theme, setThemeMode, nextThemeMode, type ThemeOverride } from "./theme";
+import { detectAppearanceSync } from "./lib/collectors/appearance";
 import type { Metrics } from "./types";
 import HeaderBar from "./components/panels/HeaderBar.vue";
 import CpuPanel from "./components/panels/CpuPanel.vue";
@@ -55,9 +56,17 @@ const themeOverride = ref<ThemeOverride>("auto");
 if (Number.isFinite(seedPresses) && seedPresses > 0) {
   for (let i = 0; i < seedPresses; i++) themeOverride.value = nextThemeMode(themeOverride.value);
 }
-// `auto` follows the system reading; an explicit light/dark wins over it.
+// Before the first poll, `metrics` is null and `m` falls back to emptyMetrics() (appearance
+// defaults to light) — which would flash light on a dark Mac for the ~100 ms until the poll
+// lands. Seed the initial appearance synchronously (live path only; the --once snapshot already
+// carries the resolved appearance), and prefer live data once it arrives.
+const initialAppearance = props.snapshot ? props.snapshot.appearance.mode : detectAppearanceSync();
+const liveAppearance = computed(
+  () => metrics.value?.appearance.mode ?? props.snapshot?.appearance.mode ?? initialAppearance,
+);
+// `auto` follows the (flash-proof) system reading; an explicit light/dark wins over it.
 const effectiveMode = computed(() =>
-  themeOverride.value === "auto" ? m.value.appearance.mode : themeOverride.value,
+  themeOverride.value === "auto" ? liveAppearance.value : themeOverride.value,
 );
 watchEffect(() => setThemeMode(effectiveMode.value));
 
