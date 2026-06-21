@@ -5,6 +5,16 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Owner review applied + B3 disk I/O sparkline (branch `redesign`).** Owner ruled the pending
+  decisions: **Q2** → dark `dim` `#5c6a64`→`#7a8478` (Everforest grey0; fixed in DESIGN.md + theme.ts,
+  pin holds); **B2 Bluetooth** + **B6 clock** DROPPED; **kept** the green-forward bars (the earlier
+  screenshot was stale); **vouched D2 (zero-sudo) + D11 (color-tier)**. Then built **B3** (owner ruled
+  ADD, overriding my drop rec): a `dio` history ring (read+write Bps) in useMetrics → a labelled `io`
+  block-`Sparkline` (accent green) in the compact DISK panel. Caught + fixed a `flexGrow="1"` (string)
+  Vue prop-type warning, and **added a gate assertion for no Vue warnings** (they hit stderr on a
+  successful render, so the stdout frame checks were blind to them). `MIN_CHECKS` 69→71. `pnpm verify`
+  PASS (71).
+
 - **Redesign polish + records sync; autonomous runway exhausted (branch `redesign`).** Hue-confinement
   completeness: DISK R/W rate text moved off the net/warn hues to neutral `text` (bodies stay
   green/neutral per D9). Synced records to "shipped": backlog `## Now` + architecture scope status now

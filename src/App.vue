@@ -43,6 +43,7 @@ const hist = computed(() => {
     mem: flat(s.memory.usedPct),
     rx: flat(s.net.rxBps),
     tx: flat(s.net.txBps),
+    dio: flat(s.disk.readBps + s.disk.writeBps),
   };
 });
 
@@ -86,7 +87,7 @@ try {
       </Box>
 
       <Box flexDirection="row" :gap="1">
-        <DiskPanel :disk="m.disk" />
+        <DiskPanel :disk="m.disk" :history="hist.dio" />
         <SensorsPanel :sensors="m.sensors" />
       </Box>
     </template>

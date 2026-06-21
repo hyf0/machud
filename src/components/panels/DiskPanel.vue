@@ -3,11 +3,12 @@ import { computed } from "vue";
 import { Box, Text } from "@vue-tui/runtime";
 import Panel from "../Panel.vue";
 import Bar from "../Bar.vue";
+import Sparkline from "../Sparkline.vue";
 import { theme } from "../../theme";
 import { pct, humanBytes } from "../../lib/format";
 import type { DiskMetric } from "../../types";
 
-const props = defineProps<{ disk: DiskMetric }>();
+const props = defineProps<{ disk: DiskMetric; history?: number[] }>();
 
 // Disk is low-value real estate, so it stays calm (its module hue) until near-full, when an
 // EARNED signal escalates: amber ≥85% "NEAR FULL", red ≥95% "FULL" (colour + text, non-hue safe).
@@ -43,6 +44,10 @@ const diskState = computed(() =>
       <Text :color="theme.text">{{ humanBytes(disk.readBps, true) }}</Text>
       <Text :color="theme.dim">  W </Text>
       <Text :color="theme.text">{{ humanBytes(disk.writeBps, true) }}</Text>
+    </Box>
+    <Box v-if="history">
+      <Text :color="theme.dim">io </Text>
+      <Box :flexGrow="1"><Sparkline :values="history" :color="theme.accent" /></Box>
     </Box>
     <Box>
       <Text :color="theme.dim">{{ humanBytes(disk.used) }} / {{ humanBytes(disk.total) }}</Text>

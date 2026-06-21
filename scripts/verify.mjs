@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 69;
+const MIN_CHECKS = 71;
 
 let failures = 0;
 let total = 0;
@@ -161,6 +161,10 @@ const f40hero = await run("node", [bundle, "--once"], {
 check(!f40hero.includes("█ █ █ █"), "narrow layout drops the BigNumber hero (responsive seam works)");
 check(!frame.includes("⚡"), "no ⚡ emoji in the frame (charge state uses ⇡/⇣)");
 check(/[⠁-⣿]/.test(frame), "braille area history graph renders (filled braille)");
+// No Vue render warnings (invalid prop types, etc.). They go to stderr on a SUCCESSFUL render, so the
+// stdout frame checks above can't see them — capture both streams via runExit.
+const rWarn = await runExit("node", [bundle, "--once"], { cwd: root, env: { ...process.env, COLUMNS: "120" } });
+check(!rWarn.out.includes("[Vue warn]"), "no Vue render warnings (clean stderr)");
 
 // ── 4. Appearance modes ────────────────────────────────────────────────────
 console.log("\nappearance");
@@ -396,6 +400,13 @@ for (const [lvl, want] of [
   };
   const sf = stripAnsi(await run("node", [bundle, "--once"], { env }));
   check(/power +(on AC|—)/.test(sf), "battery power row is always present (stability — on AC/— with no flow)");
+}
+{
+  // Disk I/O history sparkline (B3, owner-ruled add): the compact DISK panel shows a labelled `io`
+  // sparkline of total read+write throughput. Block glyphs only follow the unique "io " label here,
+  // so it's collision-free.
+  const sf = stripAnsi(await run("node", [bundle, "--once"], { env: { ...process.env, COLUMNS: "120" } }));
+  check(/io +[▁▂▃▄▅▆▇█]/.test(sf), "disk I/O history sparkline renders (io + block glyphs)");
 }
 {
   // Colour-tier / D11 (RD3): the gradient gate (supportsTruecolor = chalk.level>=3) is the SAME

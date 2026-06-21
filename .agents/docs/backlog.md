@@ -154,11 +154,10 @@ single dashboard — D1/D5), **Q2** is VOUCHED-blocked, and the redesign commits
 - **B2 — Bluetooth panel** · `DROPPED (owner ruling 2026-06-21)` — owner: no Bluetooth. The data is
   sparse/variable (devices connect/disconnect; often nothing connected) and a new panel would crowd
   the curated 3-tier (D1). Reopen only with @hyf0.
-- **B3 — Disk I/O history sparkline** · `DEFERRED` — Disk is demoted to the tier-3 strip (D9/DESIGN.md);
-  reassess whether a sparkline still fits before building. **Reassessed 2026-06-21:** Disk is now a
-  compact tier-3 panel; a history sparkline conflicts with the compact "status" intent (Principle 4 —
-  Disk earns the least real estate). Recommend DROP unless Disk regains room — owner's call. The R/W
-  rate numbers stay.
+- **B3 — Disk I/O history sparkline** · `DONE` — Owner ruled **ADD** (2026-06-21), overriding the drop
+  recommendation. A labelled `io` block-sparkline of total read+write throughput sits in the compact
+  DISK panel (own history ring `dio` in useMetrics; `Sparkline`, accent green). verify asserts it
+  renders. `MIN_CHECKS` 69→70.
 - **B6 — Standalone Clock module** · `DROPPED (owner ruling 2026-06-21)` — the clock already lives in
   the header; a separate module is redundant on a single curated dashboard (D1).
 
