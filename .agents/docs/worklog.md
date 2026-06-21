@@ -5,6 +5,28 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **Adversarial-review defect pass #2 (branch `main`).** Two more reviewers (components / gate-coverage
+  + borderline re-exam) + `vp check`; each finding re-verified before fixing. **Defects fixed (TDD):**
+  - **battery `finishing charge` mislabeled (B1).** `\bcharging\b` matches the word "charging", not
+    pmset's end-of-charge state "finishing charge" → the panel showed "not charging / on AC" while
+    power flowed IN. Now `(/\bcharging\b/ || /finishing charge/) && !discharging/not-charging`; "charged"
+    (full) still false. New `MACHUD_TEST_BATT_STATE` hook drives it.
+  - **CpuPanel crash on empty loadAvg.** `cpu.loadAvg[0].toFixed(2)` — the lone unguarded array index;
+    `loadAvg:[]` took the WHOLE UI down (violates "never crash, just degrade"). Now `(…[0] ?? 0)`.
+    Latent today (`os.loadavg()`/empty.ts always give 3) but the invariant is now enforced + gated.
+  - **humanBytes printed "1024 KB".** Rounding pushed values to "1024 <unit>" (= 1 of the next unit)
+    instead of rolling up. Now promotes to "1.0 MB" etc.
+  - **adapter Watts read the wrong dict.** `/"Watts"=/` matched `AppleRawAdapterDetails` (appears first
+    in ioreg), not `AdapterDetails` — correct only by value-equality luck; comment claimed otherwise.
+    Anchored to `"AdapterDetails"…"Watts"` (still reads 140 W here) + honest comment.
+  - **Gate-coverage holes closed (false-green risks the audit found):** GPU/DISK/BATTERY/NET/SENSORS
+    headline values were asserted only in `--json`/by title → now asserted in the rendered FRAME via
+    injection; the narrow view was width-only → now asserts labeled content (`CPU 44%`/`BAT 71%` @40);
+    the footer hint (`q quit · t theme`) is now pinned.
+  - **Noted, not fixed:** `vp check` reports formatting drift in 26 files (repo was never oxfmt'd) —
+    left untouched; a repo-wide reformat is an owner aesthetic call, not a defect, and would bury diffs.
+  - `MIN_CHECKS` 82→89, `pnpm verify` **PASS (89)**.
+
 - **Adversarial-review defect pass (branch `main`).** Ran three independent reviewers (collectors /
   render-lifecycle / docs-vs-code), each required to prove findings with `file:line` + a repro; then
   re-verified every finding myself before fixing. **Code defects fixed (TDD):**

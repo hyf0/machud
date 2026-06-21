@@ -20,7 +20,7 @@ defineProps<{ cpu: CpuMetric; history: number[] }>();
 
     <Box justifyContent="space-between">
       <BigNumber :value="cpu.usage" suffix="%" :color="theme.cpu" />
-      <Text :color="theme.dim">load {{ cpu.loadAvg[0].toFixed(2) }}</Text>
+      <Text :color="theme.dim">load {{ (cpu.loadAvg[0] ?? 0).toFixed(2) }}</Text>
     </Box>
 
     <Graph :values="history" :max="100" :height="4" :color="theme.cpu" />

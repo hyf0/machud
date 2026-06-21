@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 82;
+const MIN_CHECKS = 89;
 
 let failures = 0;
 let total = 0;
@@ -541,6 +541,80 @@ for (const [lvl, want] of [
     !lo.includes("\x1b[38;2;") && lo.includes("CPU") && !/NaN|undefined/.test(lo),
     "256-colour (chalk.level 2) degrades to solid — no 24-bit codes",
   );
+}
+{
+  // B1: a battery in "finishing charge" (end-of-charge, ~99%) is ACTIVELY charging — but \bcharging\b
+  // matches the word "charging", not "charge", so it read as not-charging. MACHUD_TEST_BATT_STATE feeds
+  // the parsed state. Require charging=true; "charged" (full, on AC) must stay false (regression guard).
+  let chg = null;
+  let full = null;
+  try {
+    chg = JSON.parse(await run("node", [bundle, "--json"], { env: { ...process.env, MACHUD_TEST_BATT_STATE: "finishing charge" } }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  try {
+    full = JSON.parse(await run("node", [bundle, "--json"], { env: { ...process.env, MACHUD_TEST_BATT_STATE: "charged" } }));
+  } catch {
+    /* parse fail → assertion fails */
+  }
+  check(chg?.battery?.charging === true, "battery 'finishing charge' counts as charging (B1)");
+  check(full?.battery?.charging === false, "battery 'charged' (full, on AC) is NOT charging (regression)");
+}
+{
+  // Never-crash invariant (CpuPanel): a malformed/empty loadAvg must DEGRADE, not take down the whole
+  // UI. Inject loadAvg:[] (arrays replace) → the one-shot render must still exit 0 and draw the panel.
+  const r = await runExit("node", [bundle, "--once"], {
+    cwd: root,
+    env: { ...process.env, COLUMNS: "120", MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { loadAvg: [] } }) },
+  });
+  check(r.code === 0 && r.out.includes("CPU") && !r.out.includes("toFixed"), "CpuPanel degrades on empty loadAvg (never crash)");
+}
+{
+  // format.humanBytes: rounding must roll to the next unit, never print "1024 KB" (= 1 MB). Inject a
+  // net rate that rounds up at the KB boundary → the frame shows "1.0 MB", never "1024 KB".
+  const env = { ...process.env, MACHUD_TEST_OVERRIDE: JSON.stringify({ net: { rxBps: 1048575 } }), COLUMNS: "120" };
+  const f = await run("node", [bundle, "--once"], { env });
+  check(f.includes("1.0 MB") && !f.includes("1024 KB"), "humanBytes rolls 1024 KB up to 1.0 MB (no '1024 <unit>')");
+}
+{
+  // Gate-coverage: GPU/DISK/BATTERY/NET/SENSORS headline VALUES must render in the FRAME — previously
+  // asserted only in --json + by panel title, so a render-layer break (wrong binding, empty formatter,
+  // dropped row) could stay green. Inject distinctive values → each must appear in the wide frame.
+  const env = {
+    ...process.env,
+    COLUMNS: "120",
+    MACHUD_TEST_OVERRIDE: JSON.stringify({
+      gpu: { usage: 43 },
+      disk: { usedPct: 59 },
+      battery: { present: true, pct: 67 },
+      net: { rxBps: 3145728 },
+      sensors: { thermalPressure: "Fair" },
+    }),
+  };
+  const f = stripAnsi(await run("node", [bundle, "--once"], { env }));
+  check(
+    f.includes("43%") && f.includes("59%") && f.includes("67%") && f.includes("3.0 MB") && f.includes("Fair"),
+    "GPU/DISK/BATTERY/NET/SENSORS headline values render in the frame (not just JSON)",
+  );
+}
+{
+  // Gate-coverage: the narrow/watch-face view must render real labeled content, not merely fit width
+  // (the old gate asserted only widest≤40 + no-hero, so a blank narrow view would pass). Inject
+  // distinctive cpu/battery values at COLUMNS=40 → the compact rows must show them.
+  const env = {
+    ...process.env,
+    COLUMNS: "40",
+    MACHUD_TEST_OVERRIDE: JSON.stringify({ cpu: { usage: 44 }, battery: { present: true, pct: 71 } }),
+  };
+  const f = stripAnsi(await run("node", [bundle, "--once"], { env }));
+  check(f.includes("CPU 44%") && f.includes("BAT 71%"), "narrow view renders labeled content (CPU/BAT values at COLUMNS=40)");
+}
+{
+  // Gate-coverage: the footer advertises the keybindings; a regression dropping "t theme" would
+  // silently lose toggle discoverability while the toggle still works. Assert the wide footer hint.
+  const f = stripAnsi(await run("node", [bundle, "--once"], { env: { ...process.env, COLUMNS: "120" } }));
+  check(f.includes("q quit") && f.includes("t theme"), "footer advertises the q/t keybindings");
 }
 
 // ── 9. Real npx artifact: pack → install → exec (RD0d, D13) ─────────────────

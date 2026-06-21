@@ -6,11 +6,18 @@ export async function collectBattery(): Promise<BatteryMetric> {
   const batt = await sh("pmset", ["-g", "batt"]);
   const present = /InternalBattery/.test(batt);
   const pct = Number(batt.match(/(\d+)%/)?.[1] ?? (present ? 0 : 100));
+  // MACHUD_TEST_BATT_STATE (see verify.mjs) overrides the parsed power state so the gate can
+  // exercise charging / charged / finishing-charge without that hardware state.
   const state =
+    process.env.MACHUD_TEST_BATT_STATE ||
     batt.match(/\d+%;\s*([^;]+);/)?.[1]?.trim() ||
     (batt.includes("AC Power") ? "AC power" : "unknown");
-  // \bcharging\b so "discharging" doesn't match (it contains "charging" with no word boundary).
-  const charging = /\bcharging\b/i.test(state) && !/discharging|not charging/i.test(state);
+  // Active charging includes "finishing charge" — pmset's end-of-charge state, which is the word
+  // "charge", not "charging", so \bcharging\b alone missed it. Still exclude "discharging" (no \b
+  // before its "charging") and "not charging"; "charged" (full, on AC) must NOT count as charging.
+  const charging =
+    (/\bcharging\b/i.test(state) || /finishing charge/i.test(state)) &&
+    !/discharging|not charging/i.test(state);
   const tm = batt.match(/(\d+):(\d+)\s+remaining/);
   const timeRemaining = tm && !(tm[1] === "0" && tm[2] === "00") ? `${tm[1]}:${tm[2]}` : null;
 
@@ -46,9 +53,12 @@ export async function collectBattery(): Promise<BatteryMetric> {
   const amperage = toSigned64(rawAmp); // signed mA
   const chargeWatts = voltage != null && amperage != null ? (voltage * amperage) / 1e6 : null;
 
-  // Adapter max wattage — live-detected (AdapterDetails.Watts), varies by cable/charger; only on AC.
+  // Adapter max wattage from AdapterDetails.Watts (varies by cable/charger; only on AC). Anchor to
+  // "AdapterDetails" specifically: AppleRawAdapterDetails appears FIRST in ioreg, so a bare /"Watts"=/
+  // would read the raw dict. The opening quote of `"AdapterDetails"` never occurs inside the raw key
+  // (there it's `…Raw` + `AdapterDetails"`, no leading quote), so this anchors the negotiated value.
   const externalConnected = /"ExternalConnected" = Yes/.test(io);
-  const wattsMatch = io.match(/"Watts"=(\d+)/);
+  const wattsMatch = io.match(/"AdapterDetails"[\s\S]*?"Watts"=(\d+)/);
   const adapterWatts = externalConnected && wattsMatch ? Number(wattsMatch[1]) : null;
 
   return {

@@ -12,7 +12,13 @@ export function humanBytes(n: number | null, perSec = false): string {
     v /= 1024;
     i++;
   }
-  const s = v >= 100 || i === 0 ? v.toFixed(0) : v.toFixed(1);
+  let s = v >= 100 || i === 0 ? v.toFixed(0) : v.toFixed(1);
+  // Rounding can push the value to "1024" (= 1 of the next unit); promote so we never show "1024 KB".
+  if (Number(s) >= 1024 && i < units.length - 1) {
+    v /= 1024;
+    i++;
+    s = v >= 100 || i === 0 ? v.toFixed(0) : v.toFixed(1);
+  }
   return `${s} ${units[i]}${perSec ? "/s" : ""}`;
 }
 
