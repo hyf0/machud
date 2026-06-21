@@ -21,8 +21,9 @@ it's what keeps an opinionated tool coherent.
 
 machud is opinionated by design, so these are usually declined:
 
-- **Configuration / theming.** No config files, no theme switcher, no per-user layout. The
-  single curated look — including the palette — is deliberate, not an oversight.
+- **Configuration / theming.** No config files, no per-user layout, no palette options. The single
+  curated look — including the palette — is deliberate, not an oversight. (The lone in-app control is
+  `t`, an ephemeral auto→light→dark view toggle — D16; it persists nothing.)
 - **New features or modules** that alter the curated dashboard, unless agreed in an issue first.
 - **Aesthetic changes** (palette, layout, glyphs). The visual identity is a documented
   decision; it is not up for per-PR negotiation.

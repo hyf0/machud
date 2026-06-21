@@ -5,20 +5,19 @@
 # autonomous loop optimizes visual choices AGAINST. It is a product decision, not a
 # preference — see CONTRIBUTING.md and .agents/docs/decisions.md (D9).
 #
-# STATUS: most of this is TARGET, not yet shipped. The code does NOT implement it yet
-# (src/theme.ts is still Tokyo Night; the layout is still the flat 3-row grid). Build
-# toward this via the staged RD0–RD5 backlog. Do NOT treat an unbuilt section here as a
-# passing invariant — a "panel renders" grep is not "matches DESIGN.md". Each section is
-# tagged (TARGET) or (SHIPPED).
+# STATUS: the staged RD0–RD5 redesign SHIPPED 2026-06-21 — the code now implements this
+# (src/theme.ts is Everforest; the layout is the 3-tier hierarchy). Do NOT treat any
+# still-unbuilt detail here as a passing invariant — a "panel renders" grep is not
+# "matches DESIGN.md". Each section is tagged (TARGET) or (SHIPPED).
 meta:
   name: machud
   mood: "cool but refined — a calm, green-forward instrument; striking, never harsh"
   basis: "Everforest — a low-strain, muted, eye-friendly scheme; green-forward, using Everforest's own green"
   appearance: "follows macOS system light/dark automatically (D8); ephemeral t-key override auto→light→dark (D16)"
 
-# --- COLORS (TARGET) — the source of truth. src/theme.ts MUST be rewritten to these
-#     tokens (it is still Tokyo Night today — backlog RD1); verify.mjs pins the hex so
-#     doc and code can never silently desync again. ---
+# --- COLORS (SHIPPED — RD1) — the source of truth. src/theme.ts mirrors these tokens
+#     (the Everforest rewrite shipped in RD1); verify.mjs pins the hex so doc and code
+#     can never silently desync again. ---
 colors:
   dark:
     bg:      "#2d353b"   # soft black, never #000
@@ -83,7 +82,7 @@ glyphs:
 
 # --- SPACE & WEIGHT ---
 space:
-  layout:    "(TARGET) wide curated default = 3-tier hierarchy; + ONE narrow/watch-face fallback (responsive, D4 reopened). NOT the old flat 3-row grid; NOT a 5-breakpoint ladder."
+  layout:    "(SHIPPED — RD4/RD5) wide curated default = 3-tier hierarchy; + ONE narrow/watch-face fallback (responsive, D4). NOT the old flat 3-row grid; NOT a 5-breakpoint ladder."
   gutter:    1            # 1 cell padding inside every panel border
   panel_gap: 1
   bar_align: "within a panel, ALL bars share one label-column width + one bar width; left edges, bar ends, and value columns form clean vertical rules. Guaranteed in the WIDE layout where bars render (not at watch-face XS)."
@@ -109,9 +108,9 @@ this document is the anchor for the part a gate can't fully check — the *beaut
 "beautiful, zero-config." Changing anything here is a [VOUCHED]-level decision: ship nothing
 that contradicts this file without the owner's say-so.
 
-> **This is a TARGET.** The current code has not implemented it (theme.ts is Tokyo Night; the
-> layout is the old flat 3-row grid). The loop builds toward it via the staged RD0–RD5 backlog,
-> safety-net first. Until a section is shipped, do not treat its prose as a passing invariant.
+> **Mostly SHIPPED.** The staged RD0–RD5 redesign landed 2026-06-21 — theme.ts is Everforest and
+> the layout is the 3-tier hierarchy. A few per-module details may still be TARGET; until a section
+> is tagged SHIPPED, do not treat its prose as a passing invariant.
 
 ## Overview — the one-line thesis
 
@@ -163,8 +162,8 @@ The seven principles are the whole spec in miniature.
 The palette is **Everforest** — muted, low-contrast, eye-strain-conscious. The **primary accent
 is Everforest's own green (`#a7c080`)**; green-forward is the identity. (A nice fit for a
 vue-tui project, but the color is Everforest's, not bent to match Vue.) The `colors` tokens
-above are the source of truth; **`src/theme.ts` must be rewritten to mirror them (it is still
-Tokyo Night — RD1)**, and verify.mjs pins the hex so they can't silently diverge.
+above are the source of truth; **`src/theme.ts` mirrors them (the Everforest rewrite shipped in
+RD1)**, and verify.mjs pins the hex so they can't silently diverge.
 
 Rules (*Refactoring UI*, Few, Tufte's *smallest effective difference*):
 - **Never pure black or pure white.** Base `#2d353b`, text warm off-white.
@@ -247,7 +246,7 @@ hierarchy** — important up top, minor compressed below:
   supporting line (top CPU process / load avg). **Apple-Silicon only** for the P/E split: detect
   cluster count via `hw.nperflevels` (Intel = 1) — `cpu.ts` reads `hw.perflevel0/1.logicalcpu` and
   treats a missing `perflevel1` as `eCount=0`; on a single cluster render ONE unlabelled cluster,
-  never `0P+0E` or all-P. Frequency needs `sudo` → `—`. (Two short bars + a number in a big box is
+  never `0P+0E` or all-P. Frequency needs `sudo` → omitted. (Two short bars + a number in a big box is
   the failure mode Principle 8 forbids.)
 
   **Same lens for the others (owner: 举一反三):** MEM → a wired/compressed/app/cache **breakdown bar**
@@ -279,7 +278,7 @@ hierarchy** — important up top, minor compressed below:
   neutral when roomy; `levelColor`-driven bar + a `NEAR FULL`/`FULL` text token at ≥85% / ≥95%.
   (Today DiskPanel hardcodes the disk hue and wires no levelColor — RD3 fix.)
 - **SENSORS — tier-3 strip.** `pmset` thermal pressure (coloured good/warn/bad by severity) +
-  battery pack temp. Die temps / fan RPM need `sudo` → `—`.
+  battery pack temp. Die temps / fan RPM need `sudo` → omitted (D2).
 
 ## Do's & Don'ts
 

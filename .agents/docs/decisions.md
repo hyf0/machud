@@ -135,8 +135,8 @@ through COLOR. The palette is **Everforest** (green-forward, using Everforest's 
 data story, not the palette.
 
 The full spec lives in [`/DESIGN.md`](../../DESIGN.md) and is the **hands-off aesthetic anchor**
-the loop optimizes against — a [VOUCHED]-level surface. Most of it is currently **TARGET** (the
-code is still Tokyo Night + the old grid); the staged RD0–RD5 backlog builds toward it.
+the loop optimizes against — a [VOUCHED]-level surface. The staged RD0–RD5 backlog **shipped it**
+(2026-06-21): the code is now Everforest + the 3-tier layout, pinned by the verify gate.
 
 - **Do:** make `src/theme.ts` the runtime mirror of the DESIGN.md tokens, pinned in verify.mjs.
 - **Don't:** drift the look, or treat unbuilt DESIGN.md prose as a passing invariant.

@@ -30,8 +30,8 @@ readings, and doubles as a pipe-friendly snapshot.
 
 - **Zero-sudo first.** All data comes from unprivileged commands (`sysctl`, `vm_stat`,
   `ioreg`, `pmset`, `netstat`, `df`, `ps`) + Node's `os`. Metrics that need `sudo`
-  (powermetrics: precise per-cluster freq, GPU watts, fan RPM, die temps) are shown
-  as "—", never block startup. See `.agents/docs/architecture.md`.
+  (powermetrics: precise per-cluster freq, GPU watts, fan RPM, die temps) are omitted
+  (D2 — not shown as dead `—` rows), never block startup. See `.agents/docs/architecture.md`.
 - **Never crash, just degrade.** `sh()` resolves "" on failure; each collector returns
   safe nulls; `collectAll()` swaps any throwing collector for its empty default.
 - **Architecture.** `src/lib/collectors/*` (one file per module) → `useMetrics` poller →

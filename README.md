@@ -47,7 +47,7 @@ node dist/machud.mjs --once    # render ONE real-data frame to stdout and exit
 
 ## Design
 
-- **Zero-sudo first.** Every reading comes from unprivileged commands (`sysctl`, `vm_stat`, `ioreg`, `pmset`, `netstat`, `df`, `ps`) plus Node's `os`. Metrics that would need `sudo` — precise per-cluster frequency, GPU watts, fan RPM, die temperatures — render as `—`. They never block startup, and machud never asks for your password.
+- **Zero-sudo first.** Every reading comes from unprivileged commands (`sysctl`, `vm_stat`, `ioreg`, `pmset`, `netstat`, `df`, `ps`) plus Node's `os`. Metrics that would need `sudo` — precise per-cluster frequency, GPU watts, fan RPM, die temperatures — are left out rather than shown as dead rows. They never block startup, and machud never asks for your password.
 - **Never crash, just degrade.** Each collector returns safe nulls on failure, and any throwing collector is swapped for its empty default. A missing metric is a dash, not a stack trace.
 - **Apple-Silicon-aware.** P/E-core clusters, unified-memory pressure, and live battery wattage are first-class — with graceful single-cluster fallback on Intel.
 
