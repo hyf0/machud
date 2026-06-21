@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="machud" src="./.github/assets/banner.png" width="640">
+  <img alt="machud" src="https://raw.githubusercontent.com/hyf0/machud/main/.github/assets/banner.png" width="640">
 </p>
 
 <p align="center">
@@ -12,7 +12,19 @@
 
 ## Quick start
 
-Requires macOS and Node ≥ 22.18.
+Requires macOS and Node ≥ 22.18. No install, no config, no password:
+
+```bash
+npx machud@latest
+```
+
+> **Using [Vite+](https://viteplus.dev)?** Try it with:
+>
+> ```bash
+> vpx machud@latest
+> ```
+
+### From source
 
 ```bash
 pnpm install
