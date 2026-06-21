@@ -34,9 +34,5 @@ const pressureColor = computed(() =>
       <Text :color="theme.dim">battery temp</Text>
       <Text :color="theme.text">{{ temp(sensors.batteryTempC) }}</Text>
     </Box>
-    <Box justifyContent="space-between">
-      <Text :color="theme.dim">fan</Text>
-      <Text :color="theme.dim">{{ sensors.fanRpm ?? "— sudo" }}</Text>
-    </Box>
   </Panel>
 </template>

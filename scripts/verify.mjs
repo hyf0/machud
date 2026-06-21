@@ -22,7 +22,7 @@ const bundle = join(root, "dist", "machud.mjs");
 
 // Strengthen-only floor (autonomy.md gate rule 2): you may ADD assertions (raise this);
 // you must STOP-and-ask before removing one. A dropped count turns the gate RED.
-const MIN_CHECKS = 72;
+const MIN_CHECKS = 74;
 
 let failures = 0;
 let total = 0;
@@ -110,6 +110,10 @@ if (m) {
   // GPU / Disk / Net
   check(inRangeOrNull(m.gpu.usage, 0, 100), "gpu usage null or 0–100");
   check(m.disk.total > 0 && inRange(m.disk.usedPct, 0, 100), "disk total>0 and usedPct in range");
+  check(
+    m.disk.total > 0 && Math.abs(m.disk.usedPct - ((m.disk.total - m.disk.free) / m.disk.total) * 100) < 1.5,
+    "disk usedPct = (total−free)/total (APFS-correct, not df's misleading per-volume Used)",
+  );
   check(m.net.rxBps >= 0 && m.net.txBps >= 0, "net rates non-negative");
   check(!("ip" in m.net), "net carries no ip field (D12 privacy/screenshot waiver)");
 
@@ -142,6 +146,9 @@ for (const title of ["CPU", "MEMORY", "GPU", "DISK", "NETWORK", "BATTERY", "SENS
 }
 check(/\d\d:\d\d:\d\d/.test(frame), "header clock renders (HH:MM:SS)");
 check(!/NaN|undefined/.test(frame), "frame has no NaN/undefined");
+// Zero-sudo identity: the UI never shows the word "sudo" — no dead "— sudo" rows for permanently
+// sudo-only metrics (fan RPM etc.); they're omitted (D2 display ruling). Also catches the old footer.
+check(!frame.includes("sudo"), "no 'sudo' shown anywhere in the frame (D2 — omit dead sudo-only rows)");
 // Visual-correctness harness (RD0b): no rendered line may exceed the wide target.
 // Feature-coupled visual assertions (alignment, no-⚡, narrow widths, FORCE_COLOR
 // fallback) land WITH their features in RD3/RD4/RD5 — see backlog.

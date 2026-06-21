@@ -9,8 +9,11 @@ export async function collectDisk(): Promise<DiskMetric> {
   const df = await sh("df", ["-k", "-P", "/"]);
   const f = (df.trim().split("\n").pop() ?? "").split(/\s+/);
   const total = (Number(f[1]) || 0) * 1024;
-  const used = (Number(f[2]) || 0) * 1024;
-  const free = (Number(f[3]) || 0) * 1024;
+  const free = (Number(f[3]) || 0) * 1024; // df "Available"
+  // APFS: df's "Used" column (f[2]) counts only THIS volume, not the shared container (snapshots, the
+  // Data volume, purgeable) — it reads ~4% on an 80%-full disk. Derive used from total − available so
+  // the figure matches what Finder / About-This-Mac shows.
+  const used = clamp(total - free, 0, total);
   const usedPct = total > 0 ? clamp((used / total) * 100) : 0;
 
   // Cumulative bytes since boot from every block-storage driver; diff for a rate.

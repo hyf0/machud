@@ -34,6 +34,9 @@ GPU/ANE watts, fan RPM, die temps) is shown as `—`, never blocks, never prompt
 - **Don't:** make the experience depend on elevated privileges, or add any code path —
   default or flagged — that shells `sudo`. A privileged helper is exactly the kind of
   fragile, security-sensitive surface this project refuses (see CONTRIBUTING.md / D1).
+- **Display (owner ruling 2026-06-21):** a metric that is *permanently* sudo-only (e.g. **fan RPM**)
+  is **omitted**, not shown as a dead `— sudo` row — it never carries information here, so it's just
+  clutter. (A metric that's merely momentarily absent still shows `—`.) The UI never prints "sudo".
 
 ## D3. Never crash, just degrade
 

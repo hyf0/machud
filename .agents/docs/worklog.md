@@ -5,6 +5,15 @@ anything to eyeball. Newest first.
 
 ## 2026-06-21
 
+- **DISK %-full bug + drop dead fan row (branch `main`).** Owner caught both. (1) **DISK usedPct was
+  wrong** — it used df's "Used" column, which on APFS counts only the `/` volume (~4%), not the shared
+  container; an ~80%-full disk read **4%** (and "16.6 GB used / 70 GB free" was self-contradictory).
+  Fixed: `used = total − free` (df Available), so usedPct matches Finder (~83% here). Verify now pins
+  `usedPct == (total−free)/total` (±1.5). (2) **SENSORS `fan` row dropped** — fan RPM is *permanently*
+  sudo-only (D2), so a forever-`— sudo` row is noise; omitted it. Verify now asserts **no `sudo`
+  anywhere in the frame** (also guards the trimmed footer). Refined **D2** (owner): permanently
+  sudo-only metrics are omitted, not shown as dead `—` rows. `MIN_CHECKS` 72→74, `pnpm verify` PASS.
+
 - **Footer trimmed (branch `main`).** Owner: the `zero-sudo · machud` tail in the bottom bar is
   redundant (machud is already the top-left wordmark). Footer is now just `q quit · refresh 1s`.
   Repointed the appearance "frame renders" assertion off the footer `machud` marker to the `CPU`
